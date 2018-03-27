@@ -1,0 +1,128 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Ol3 draw</title>
+	<link rel="stylesheet" type="text/css" href="../../../plugin/ol3/css/ol.css"/>
+	<style type="text/css">
+		body, #map {
+			border: 0px;
+			margin: 0px;
+			padding: 0px;
+			width: 100%;
+			height: 100%;
+			font-size: 13px;
+		}
+	</style>
+	<script type="text/javascript" src="../../../plugin/ol3/build/ol.js"></script>
+	<script type="text/javascript" src="../../../plugin/jquery/jquery-1.8.3.js"></script>
+	<script type="text/javascript">
+		function init(){
+			var untiled = new ol.layer.Image({
+				source: new ol.source.ImageWMS({
+					ratio: 1,
+					url: 'http://192.168.10.185:8086/geoserver/lzugis/wms',
+					params: {'FORMAT': 'image/png',
+						'VERSION': '1.1.1',
+						LAYERS: 'lzugis:province',
+						STYLES: ''
+					},
+					serverType: 'geoserver'
+				})
+			});
+			var features = new Array();
+
+            var data = {
+                "type":"Feature",
+                "properties":{"voage":"500","color":"0,51,255","level":2,"levellabel":"蓝色","name":"F_MATTER","lon":"116.267171","label":null,"ws":4.779718,"objectid":"23","lat":"40.183477","gust":8.120741},
+                "geometry": {
+                    "type": "MultiLineString",
+                    "coordinates": [
+                        [
+                            [
+                                114.4568,
+                                36.0938
+                            ],
+                            [
+                                112.4567,
+                                36.0932
+                            ]
+                        ]
+                    ]
+                }
+            };
+            features.push(json2Feature(data));
+
+			var vector = new ol.layer.Vector({
+				source: new ol.source.Vector({
+					features: features
+				})
+			});
+			var map = new ol.Map({
+				controls: ol.control.defaults({
+					attribution: false
+				}),
+				target: 'map',
+				layers: [untiled,vector],
+				view: new ol.View({
+					projection: new ol.proj.Projection({
+						code: 'EPSG:4326',
+						units: 'degrees'
+					}),
+					center: [103.847, 36.0473],
+        			zoom: 4
+				})
+			});
+
+			function json2Feature(data){
+			    var _geom = null;
+				switch (data.geometry.type){
+					case "Point":{
+                        _geom = new ol.geom.Point(data.geometry.coordinates);
+					    break;
+					}
+                    case "LineString":{
+                        _geom = new ol.geom.LineString(data.geometry.coordinates);
+                        break;
+                    }
+                    case "Polygon":{
+                        _geom = new ol.geom.Polygon(data.geometry.coordinates);
+                        break;
+                    }
+                    case "MultiPoint":{
+                        _geom = new ol.geom.MultiPoint(data.geometry.coordinates);
+                        break;
+                    }
+                    case "MultiLineString":{
+                        _geom = new ol.geom.MultiLineString(data.geometry.coordinates);
+                        break;
+                    }
+                    case "MultiPolygon":{
+                        _geom = new ol.geom.MultiPolygon(data.geometry.coordinates);
+                        break;
+                    }
+                    case "GeometryCollection":{
+                        _geom = new ol.geom.Point(data.geometry.coordinates);
+                        break;
+                    }
+					default:{
+					    break
+					}
+				}
+				if(_geom){
+                    return new ol.Feature({
+                        geometry: _geom,
+                        attr: data.properties
+                    });
+				}
+				else {
+				    return null;
+				}
+			}
+		}
+	</script>
+</head>
+<body onLoad="init()">
+<div id="map">
+</div>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>cluster</title>
+	<link rel="stylesheet" type="text/css" href="../../../plugin/ol3/css/ol.css"/>
+	<style type="text/css">
+		body, #map {
+			border: 0px;
+			margin: 0px;
+			padding: 0px;
+			width: 100%;
+			height: 100%;
+			font-size: 13px;
+			overflow: hidden;
+		}
+	</style>
+	<script type="text/javascript" src="../../../plugin/ol3/build/ol-debug.js"></script>
+	<script type="text/javascript" src="../../../plugin/jquery/jquery-1.8.3.js"></script>
+	<script type="text/javascript">
+		var map;//[104.21390114106414, 35.847595169932646]
+		function GetRandomNum(Min,Max)
+		{
+			var Range = Max - Min;
+			var Rand = Math.random();
+			return(Min + Math.round(Rand * Range));
+		}
+		function init(){
+			var distance = document.getElementById('distance');
+			var count = 2000;
+			var features = new Array(count);
+			for (var i = 0; i < count; ++i) {//73.4510046356223, 18.1632471876417,134.976797646506, 53.5319431522236
+				var x = GetRandomNum(73.4510046356223,134.976797646506), y = GetRandomNum(18.1632471876417,53.5319431522236);
+				var coordinates = [x, y];
+				features[i] = new ol.Feature(new ol.geom.Point(coordinates));
+			}
+
+			var source = new ol.source.Vector({
+				features: features
+			});
+
+			var clusterSource = new ol.source.Cluster({
+				distance: parseInt(distance.value, 10),
+				source: source
+			});
+
+			var styleCache = {};
+
+            function getStyle(feature, resolution) {
+                var size = feature.get('features').length;
+                var radius = 10,color = "#3399CC",textColor = "#ffffff";
+                if(size==1){
+                    radius = 5;
+                    color = "#0000ff";
+                    textColor = "#0000ff";
+                }
+                else if(size>1&&size<=10){
+                    radius = 8;
+                    color = "#1100ff";
+                }
+                else if(size>10&&size<=40){
+                    radius = 11;
+                    color = "#9900ff";
+                }
+                else if(size>40&&size<=50){
+                    radius = 13;
+                    color = "#ff0099";
+                }
+                else if(size>50&&size<=100){
+                    radius = 15;
+                    color = "#ff0099";
+                }
+                else{
+                    radius = 17;
+                    color = "#ff0000";
+                }
+                var style = styleCache[size];
+                if (!style) {
+                    style = [new ol.style.Style({
+                        image: new ol.style.Circle({
+                            radius: radius,
+                            stroke: new ol.style.Stroke({
+                                color: '#fff'
+                            }),
+                            fill: new ol.style.Fill({
+                                color: color
+                            })
+                        }),
+                        text: new ol.style.Text({
+                            text: size.toString(),
+                            fill: new ol.style.Fill({
+                                color: textColor
+                            }),
+                            font:"Times New Roman"
+                        })
+                    })];
+                    styleCache[size] = style;
+                }
+                return style;
+            }
+
+//            var clusters = new ol.layer.AnimatedCluster({
+//                name: 'Cluster',
+//                source: clusterSource,
+//                animationDuration: 700,
+//                style: getStyle
+//            });
+
+			var clusters = new ol.layer.Vector({
+				source: clusterSource,
+				style:getStyle
+			});
+
+			var format = 'image/png';
+			var bounds = [73.4510046356223, 18.1632471876417,
+				134.976797646506, 53.5319431522236];
+			var untiled = new ol.layer.Image({
+				source: new ol.source.ImageWMS({
+					ratio: 1,
+//					url: 'http://192.168.10.185:8086/geoserver/lzugis/wms',
+					url: 'http://192.168.10.185:8086/geoserver/lzugis/wms',
+					params: {'FORMAT': format,
+						'VERSION': '1.1.1',
+						LAYERS: 'lzugis:province',
+						STYLES: ''
+					},
+					serverType: 'geoserver'
+				})
+			});
+			var projection = new ol.proj.Projection({
+				code: 'EPSG:4326',
+				units: 'degrees'
+			});
+			map = new ol.Map({
+				controls: ol.control.defaults({
+					attribution: false
+				}),
+				target: 'map',
+				layers: [untiled,clusters],
+				view: new ol.View({
+					projection: projection
+				})
+			});
+			map.getView().fit(bounds, map.getSize());
+			
+			distance.addEventListener('input', function() {
+		        clusterSource.setDistance(parseInt(distance.value, 10));
+		    });
+		}
+	</script>
+</head>
+<body onLoad="init()">
+<div id="map">
+	<form style="position: absolute; bottom: 0px; z-index: 99;width: 100%;">
+      <label style="width: 100%; text-align: center;" >cluster distance</label>
+      <input style="width: 100%;" id="distance" type="range" min="0" max="100" step="1" value="40"/>
+    </form>
+</div>
+</body>
+</html>

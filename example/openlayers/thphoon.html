@@ -1,0 +1,332 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Ol3 wms</title>
+	<link rel="stylesheet" type="text/css" href="../../../plugin/ol3/css/ol.css"/>
+	<style type="text/css">
+		body, #map {
+			border: 0px;
+			margin: 0px;
+			padding: 0px;
+			width: 100%;
+			height: 100%;
+			font-size: 13px;
+		}
+		.ol-popup {
+			display: none;
+			position: absolute;
+			background-color: white;
+			-moz-box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+			-webkit-filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
+			filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
+			border: 1px solid #cccccc;
+			bottom: 12px;
+			left: -100px;
+			width: 200px;
+		}
+		.ol-popup:after, .ol-popup:before {
+			top: 100%;
+			border: solid transparent;
+			content: " ";
+			height: 0;
+			width: 0;
+			position: absolute;
+			pointer-events: none;
+		}
+		.ol-popup:after {
+			border-top-color: white;
+			border-width: 10px;
+			left: 100px;
+			margin-left: -10px;
+		}
+		.ol-popup:before {
+			border-top-color: #cccccc;
+			border-width: 11px;
+			left: 100px;
+			margin-left: -11px;
+		}
+		.popup-content{
+			padding: 5px 8px;
+		}
+		.ol-popup-closer {
+			text-decoration: none;
+			position: absolute;
+			top: 6px;
+			right: 6px;
+		}
+		.ol-popup-closer:after {
+			content: "×";
+		}
+	</style>
+	<script type="text/javascript" src="../../../plugin/ol3/build/ol-debug.js"></script>
+	<script type="text/javascript" src="../../../plugin/jquery/jquery-1.8.3.js"></script>
+	<script type="text/javascript">
+        var map;
+		function init(){
+			var img_w = getTdtLayer("img_w"),
+                cva_w = getTdtLayer("cva_w");
+			var projection = new ol.proj.Projection({
+				code: 'EPSG:3857',
+				units: 'm'
+			});
+			map = new ol.Map({
+				controls: ol.control.defaults({
+					attribution: false
+				}),
+				target: 'map',
+				layers: [img_w, cva_w],
+				view: new ol.View({
+					projection: projection,
+					center: [14206000.664717216, 2300191.525815411],
+        			zoom: 6
+				})
+			});
+
+            var container = document.getElementById('popup');
+            var content = document.getElementById('popup-content');
+            var closer = document.getElementById('popup-closer');
+            closer.onclick = function(){
+                container.style.display = 'none';
+                closer.blur();
+                return false;
+            };
+            var overlay = new ol.Overlay({
+                element: container
+            });
+            map.addOverlay(overlay);
+
+			var styleFunc = function(feature, resolution){
+			    var level = feature.get("level");
+			    var lineColor = "#ffcc33";
+			    if(level==10){
+                    lineColor = "#005599";
+				}
+                return new ol.style.Style({
+                    fill: new ol.style.Fill({
+                        color: 'rgba(255, 0, 0, 0.1)'
+                    }),
+                    stroke: new ol.style.Stroke({
+                        color: lineColor,
+                        width: 2
+                    }),
+                    image: new ol.style.Circle({
+                        radius: 7,
+                        fill: new ol.style.Fill({
+                            color: '#ff0000'
+                        })
+                    })
+                })
+			};
+            var vector = new ol.layer.Vector({
+                source: null,
+                style: styleFunc
+            });
+            map.addLayer(vector);
+            var pathStyleFunc = function(feature, resolution){
+                var type = feature.get("type");
+                var lineDash = 0, lineColor = "#0000ff", pointColor = '#ffff00';
+                if(type=="fcst"){
+                    lineDash = 5;
+                    lineColor = "#ff0000";
+                    pointColor = "#ee00ff"
+                }
+                return new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                        color: lineColor,
+                        width: 2,
+                        lineDash: [lineDash, lineDash]
+                    }),
+                    image: new ol.style.Circle({
+                        radius: 3,
+                        fill: new ol.style.Fill({
+                            color: pointColor
+                        })
+                    })
+                })
+			};
+            var vectorPath = new ol.layer.Vector({
+                source: null,
+                style: pathStyleFunc
+            });
+            map.addLayer(vectorPath);
+			var thpoonData = [], index = 0;
+			$.get("data/201713.json",function(result){
+                thpoonData = result;
+                playThpoon();
+			});
+            map.on("pointermove", function (e) {
+                map.getTargetElement().style.cursor =
+                    map.hasFeatureAtPixel(e.pixel) ? 'pointer' : '';
+            });
+            var select = new ol.interaction.Select({
+                condition: ol.events.condition.click,
+                style: pathStyleFunc
+            });
+            map.addInteraction(select);
+            select.on('select', function (e) {
+                var feature = e.target.getFeatures().item(0);
+                if (feature) {
+                    var _data = feature.get("attribute");
+                    if(_data){
+                        $(overlay).show();
+                        playThponFeature(_data);
+                        addThphoonInfo(_data);
+                    }
+                    else{
+                        $(overlay).hide();
+                    }
+                }
+            });
+            var hoverStyleFunc = function(feature, resolution){
+                var type = feature.get("type");
+                var lineDash = 0, lineColor = "#0000ff", pointColor = '#ffff00';
+                if(type=="fcst"){
+                    lineDash = 5;
+                    lineColor = "#ff0000";
+                    pointColor = '#ee00ff';
+                }
+                return new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                        color: lineColor,
+                        width: 2,
+                        lineDash: [lineDash, lineDash]
+//						lineDash: [lineDash, lineDash]
+                    }),
+                    image: new ol.style.Circle({
+                        radius: 5,
+                        fill: new ol.style.Fill({
+                            color: pointColor
+                        })
+                    })
+                })
+            };
+            var hover = new ol.interaction.Select({
+                condition: ol.events.condition.pointerMove,
+                style: hoverStyleFunc
+            });
+            map.addInteraction(hover);
+            function addThphoonInfo(data) {
+                var _coord = ol.proj.transform([data.lon, data.lat], "EPSG:4326","EPSG:3857");
+                overlay.setPosition(_coord);
+                var _html = "<p><b>中心位置</b>："+data.lon+", "+data.lat+"</p>"+
+                	"<p><b>时间</b>："+data.time+"</p>"+
+                    "<p><b>7级风圈半径</b>："+data.radius7+"公里</p>"+
+                	"<p><b>10级风圈半径</b>："+data.radius10+"公里</p>"+
+                    "<p><b>风向</b>："+data.direction+"</p>"+
+                    "<p><b>最大风速</b>："+data.direction+"m/s</p>"+
+                	"<p><b>中心最低压强</b>："+data.lowpress+"hPa</p>";
+                content.innerHTML = _html;
+                container.style.display = 'block';
+            }
+            
+			var flag = 0;
+			function playThpoon(){
+				flag = setInterval(function(){
+                    playThponFeature(thpoonData[index]);
+                    index++;
+                    if(index>0){
+                        playLineFeature();
+					}
+                    if(index===thpoonData.length){
+                        clearInterval(flag);
+                        index = 0;
+                        var fcstData = thpoonData[thpoonData.length-1].forcast;
+                        addForcastPath(fcstData);
+					}
+				},100);
+			}
+
+			function addForcastPath(fcstdata){
+                var features = [], lineCoord = [];
+                for(var i=0;i<fcstdata.length;i++){
+                    var data = fcstdata[i];
+                    var _coord = ol.proj.transform([data.lon, data.lat], "EPSG:4326","EPSG:3857");
+                    var _center = new ol.Feature({
+                        geometry: new ol.geom.Point(_coord),
+                        attribute:data,
+                        type: "fcst"
+                    });
+                    features.push(_center);
+                    lineCoord.push(_coord);
+                }
+                var _path = new ol.Feature({
+                    geometry: new ol.geom.LineString(lineCoord),
+                    type: "fcst"
+                });
+                features.push(_path);
+                vectorPath.getSource().addFeatures(features);
+			}
+
+			function playLineFeature(){
+			    var features = [], lineCoord = [];
+			    for(var i=0;i<index;i++){
+			        var data = thpoonData[i];
+                    var _coord = ol.proj.transform([data.lon, data.lat], "EPSG:4326","EPSG:3857");
+                    var _center = new ol.Feature({
+                        geometry: new ol.geom.Point(_coord),
+                        attribute:data,
+                        type: "live"
+                    });
+                    features.push(_center);
+                    lineCoord.push(_coord);
+				}
+                var _path = new ol.Feature({
+                    geometry: new ol.geom.LineString(lineCoord),
+					type: "live"
+                });
+                features.push(_path);
+                var lineSource = new ol.source.Vector({
+                    features: features
+                });
+                vectorPath.setSource(lineSource);
+			}
+			function playThponFeature(data){
+			    var features = [];
+                var _coord = ol.proj.transform([data.lon, data.lat],"EPSG:4326","EPSG:3857");
+                var _center = new ol.Feature({
+                    geometry: new ol.geom.Point(_coord)
+                });
+                features.push(_center);
+                if(data.radius7!=9999){
+                    var _circle7 = new ol.geom.Circle(_coord, data.radius7*1000,'XY');
+                    var _feature7 =  new ol.Feature({
+                        geometry:_circle7,
+						level:7
+                    });
+                    features.push(_feature7);
+				}
+                if(data.radius10!=9999){
+                    var _circle10 = new ol.geom.Circle(_coord, data.radius10*1000,'XY');
+                    var _feature10 =  new ol.Feature({
+                        geometry:_circle10,
+                        level:10
+                    });
+                    features.push(_feature10);
+                }
+                var source = new ol.source.Vector({
+                    features: features
+                });
+                vector.setSource(source);
+			}
+		}
+
+        function getTdtLayer(lyr){
+            var url = "http://t0.tianditu.com/DataServer?T="+lyr+"&X={x}&Y={y}&L={z}";
+            var layer = new ol.layer.Tile({
+                source: new ol.source.XYZ({
+                    url:url
+                })
+            });
+            return layer;
+        }
+	</script>
+</head>
+<body onLoad="init()">
+<div id="map">
+	<div id="popup" class="ol-popup">
+		<a href="#" id="popup-closer" class="ol-popup-closer"></a>
+		<div id="popup-content" class="popup-content"></div>
+	</div>
+</div>
+</body>
+</html>

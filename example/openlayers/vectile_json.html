@@ -1,0 +1,99 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+    <meta http-equiv="imagetoolbar" content="no">
+    <title>mapbox-vector</title>
+    <link rel="stylesheet" type="text/css" href="../../../plugin/ol4/ol.css"/>
+    <style type="text/css">
+        body { font-family: sans-serif; font-weight: bold; font-size: .8em; }
+        body { border: 0px; margin: 0px; padding: 0px; }
+        #map { width: 100%; height: 100%; border: 0px; padding: 0px; }
+    </style>
+    <script type="text/javascript" src="../../../plugin/ol4/ol.js"></script>
+    <script type="text/javascript" src="../../../plugin/jquery/jquery-3.1.1.min.js"></script>
+
+    <script type="text/javascript">
+        var map;
+        function init(){
+            var gridsetName = 'EPSG:4326';
+            var gridNames = ['EPSG:4326:0', 'EPSG:4326:1', 'EPSG:4326:2', 'EPSG:4326:3', 'EPSG:4326:4', 'EPSG:4326:5', 'EPSG:4326:6', 'EPSG:4326:7', 'EPSG:4326:8', 'EPSG:4326:9', 'EPSG:4326:10', 'EPSG:4326:11', 'EPSG:4326:12', 'EPSG:4326:13', 'EPSG:4326:14', 'EPSG:4326:15', 'EPSG:4326:16', 'EPSG:4326:17', 'EPSG:4326:18', 'EPSG:4326:19', 'EPSG:4326:20', 'EPSG:4326:21'];
+            var baseUrl = 'http://localhost:6080/geoserver/gwc/service/wmts';
+            var style = '';
+            var format = 'application/json;type=geojson';
+            var layerName = 'zz_rail:rail_segment';
+            var projection = new ol.proj.Projection({
+                code: 'EPSG:4326',
+                units: 'degrees',
+                axisOrientation: 'neu'
+            });
+            var resolutions = [0.703125, 0.3515625, 0.17578125, 0.087890625, 0.0439453125, 0.02197265625, 0.010986328125, 0.0054931640625, 0.00274658203125, 0.001373291015625, 6.866455078125E-4, 3.4332275390625E-4, 1.71661376953125E-4];
+            var params = {
+                'REQUEST': 'GetTile',
+                'SERVICE': 'WMTS',
+                'VERSION': '1.0.0',
+                'LAYER': layerName,
+                'STYLE': style,
+                'TILEMATRIX': gridsetName + ':{z}',
+                'TILEMATRIXSET': gridsetName,
+                'FORMAT': format,
+                'TILECOL': '{x}',
+                'TILEROW': '{y}'
+            };
+
+            function constructSource() {
+                var url = baseUrl+'?'
+                for (var param in params) {
+                    url = url + param + '=' + params[param] + '&';
+                }
+                url = url.slice(0, -1);
+
+                var source = new ol.source.VectorTile({
+                    crossOrigin: 'anonymous',
+                    url: url,
+                    format: new ol.format.GeoJSON({}),
+                    projection: projection,
+                    tileGrid: new ol.tilegrid.WMTS({
+                        tileSize: [256,256],
+                        origin: [-180.0, 90.0],
+                        resolutions: resolutions,
+                        matrixIds: gridNames
+                    }),
+                    wrapX: true
+                });
+                return source;
+            }
+
+            var layer = new ol.layer.VectorTile({
+                source: constructSource(),
+                style:function(feature){
+                    return new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                            color: '#0b05cd',
+                            width: 1
+                        })
+                    })
+                }
+            });
+
+            var view = new ol.View({
+                center: [0, 0],
+                zoom: 2,
+                projection: projection,
+                extent: [-180.0,-90.0,180.0,90.0]
+            });
+
+            map = new ol.Map({
+                controls: ol.control.defaults({attribution: false}).extend([
+                    new ol.control.MousePosition()
+                ]),
+                layers: [layer],
+                target: 'map',
+                view: view
+            });
+            map.getView().fit([110.12240659819427,31.163243477984366,116.74801664153343,36.59522735801815], map.getSize());
+        }
+    </script>
+</head>
+<body onload="init()">
+<div id="map">
+</div>
+</body>
+</html>

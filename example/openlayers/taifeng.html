@@ -1,0 +1,131 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Ol3 wms</title>
+	<link rel="stylesheet" type="text/css" href="../../../plugin/ol3/css/ol.css"/>
+	<style type="text/css">
+		body, #map {
+			border: 0px;
+			margin: 0px;
+			padding: 0px;
+			width: 100%;
+			height: 100%;
+			font-size: 13px;
+		}
+	</style>
+	<script type="text/javascript" src="../../../plugin/ol3/build/ol-debug.js"></script>
+	<script type="text/javascript" src="../../../plugin/jquery/jquery-1.8.3.js"></script>
+	<script type="text/javascript">
+        var circle1;
+		function init(){
+			var format = 'image/png';
+			var tiled = new ol.layer.Tile({
+				visible: true,
+				source: new ol.source.TileWMS({
+					url: 'http://192.168.10.185:8086/geoserver/lzugis/wms',
+					params: {'FORMAT': format,
+						'VERSION': '1.1.1',
+						tiled: true,
+						LAYERS: 'lzugis:province',
+						STYLES: ''
+					},
+					serverType: 'geoserver'
+				})
+			});
+			var projection = new ol.proj.Projection({
+				code: 'EPSG:3857',
+				units: 'm'
+			});
+			var map = new ol.Map({
+				controls: ol.control.defaults({
+					attribution: false
+				}),
+				target: 'map',
+				layers: [
+					tiled
+				],
+				view: new ol.View({
+					projection: projection,
+					center: ol.proj.transform([127.9, 15.7],"EPSG:4326",projection),
+        			zoom: 5
+				})
+			});
+
+            var data = {
+                "time": "2017-07-26T11:00:00",
+                "longitude": 127.9,
+                "latitude": 15.7,
+                "strong": "热带风暴(TS)",
+                "power": 8,
+                "speed": 18,
+                "move_dir": "北",
+                "move_speed": 15,
+                "pressure": 998,
+                "radius7": 250,
+                "radius10": 0,
+                "radius12": 0,
+                "radius7_quad": {
+                    "ne": 100,
+                    "se": 250,
+                    "sw": 250,
+                    "nw": 150
+                },
+                "radius10_quad": {
+                    "ne": 0,
+                    "se": 0,
+                    "sw": 0,
+                    "nw": 0
+                },
+                "radius12_quad": {
+                    "ne": 0,
+                    "se": 0,
+                    "sw": 0,
+                    "nw": 0
+                }
+            };
+            var _coord = ol.proj.transform([data.longitude, data.latitude],"EPSG:4326",projection);
+            var feature = new ol.Feature({
+                geometry: new ol.geom.Point(_coord)
+            });
+            circle1 = new ol.geom.Circle(_coord, 250*1000,'XY');
+            var featureC1 =  new ol.Feature({
+                geometry:circle1
+            });
+            var circle2 = new ol.geom.Circle(_coord, 150*1000,'XY');
+            var featureC2 =  new ol.Feature({
+                geometry:circle2
+            });
+            var circle3 = new ol.geom.Circle(_coord, 100*1000,'XY');
+            var featureC3 =  new ol.Feature({
+                geometry:circle3
+            });
+
+            var vector = new ol.layer.Vector({
+                source: new ol.source.Vector({
+                    features: [feature, featureC1]
+                }),
+                style: new ol.style.Style({
+                    fill: new ol.style.Fill({
+                        color: 'rgba(255, 0, 0, 0.2)'
+                    }),
+                    stroke: new ol.style.Stroke({
+                        color: '#ffcc33',
+                        width: 2
+                    }),
+                    image: new ol.style.Circle({
+                        radius: 7,
+                        fill: new ol.style.Fill({
+                            color: '#ffcc33'
+                        })
+                    })
+                })
+            });
+            map.addLayer(vector);
+		}
+	</script>
+</head>
+<body onLoad="init()">
+<div id="map">
+</div>
+</body>
+</html>

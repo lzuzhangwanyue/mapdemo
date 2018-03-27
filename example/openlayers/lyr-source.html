@@ -1,0 +1,87 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Ol3 wms</title>
+	<link rel="stylesheet" type="text/css" href="../../../plugin/ol3/css/ol.css"/>
+	<style type="text/css">
+		body, #map {
+			border: 0px;
+			margin: 0px;
+			padding: 0px;
+			width: 100%;
+			height: 100%;
+			font-size: 13px;
+		}
+	</style>
+	<script type="text/javascript" src="../../../plugin/ol3/build/ol-debug.js"></script>
+	<script type="text/javascript" src="../../../plugin/jquery/jquery-1.8.3.js"></script>
+	<script type="text/javascript">
+		function init(){
+			var format = 'image/png';
+			var pro = new ol.source.ImageWMS({
+				ratio: 1,
+				url: 'http://192.168.10.185:8086/geoserver/lzugis/wms',
+				params: {
+					'FORMAT': format,
+					'VERSION': '1.1.1',
+					LAYERS: 'lzugis:province',
+					STYLES: ''
+				},
+				serverType: 'geoserver'
+			});
+			var layer = new ol.layer.Image({
+				source: pro
+			});
+			var cap = new ol.source.ImageWMS({
+				ratio: 1,
+				url: 'http://192.168.10.185:8086/geoserver/lzugis/wms',
+				params: {
+					'FORMAT': format,
+					'VERSION': '1.1.1',
+					LAYERS: 'lzugis:capital',
+					STYLES: ''
+				},
+				serverType: 'geoserver'
+			});
+			var projection = new ol.proj.Projection({
+				code: 'EPSG:4326',
+				units: 'degrees'
+			});
+			var map = new ol.Map({
+				controls: ol.control.defaults({
+					attribution: false
+				}),
+				target: 'map',
+				layers: [
+					layer
+				],
+				view: new ol.View({
+					projection: projection,
+					center: [103.847, 36.0473],
+        			zoom: 4
+				})
+			});
+			
+			
+			$("#setZindex").attr("flag","1").on("click",function(){
+				var flag = $(this).attr("flag");
+				if(flag==="0"){
+					layer.setSource(pro);
+					$(this).attr("flag","1");
+				}
+				else{
+					layer.setSource(cap);
+					$(this).attr("flag","0");
+				}
+			});
+		}
+	</script>
+</head>
+<body onLoad="init()">
+<div id="map">
+	<div style="position: absolute;top: 10px;right:10px;z-index: 99;">
+		<button id="setZindex">setSource</button>
+	</div>
+</div>
+</body>
+</html>

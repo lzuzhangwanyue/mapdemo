@@ -1,0 +1,685 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Ol3 draw</title>
+	<link rel="stylesheet" type="text/css" href="../../../plugin/ol4/ol.css"/>
+	<style type="text/css">
+		body, #map {
+			border: 0px;
+			margin: 0px;
+			padding: 0px;
+			width: 100%;
+			height: 100%;
+			font-size: 13px;
+			overflow: hidden;
+		}
+		.city-name{
+			z-index: 9;
+			background: #ffffff;
+			border: 1px solid #1bcbb4;
+			border-radius: 3px;
+			padding: 2px;
+			position: absolute;
+		}
+	</style>
+	<script type="text/javascript" src="../../../plugin/ol4/ol.js"></script>
+	<script type="text/javascript" src="../../../plugin/jquery/jquery-1.8.3.js"></script>
+	<script type="text/javascript">
+        var map;
+		function init(){
+			var untiled = new ol.layer.Image({
+				source: new ol.source.ImageWMS({
+					ratio: 1,
+					url: 'http://localhost:6080/geoserver/bj_grid/wms',
+					params: {'FORMAT': 'image/png',
+						VERSION: '1.1.1',
+						LAYERS: 'bj_grid:capital'
+					},
+					serverType: 'geoserver'
+				})
+			});
+            var center = ol.proj.transform([103.847, 36.0473],'EPSG:4326','EPSG:3857');
+			map = new ol.Map({
+				controls: ol.control.defaults({
+					attribution: false
+				}),
+				target: 'map',
+				layers: [untiled],
+				view: new ol.View({
+					projection: new ol.proj.Projection({
+						code: 'EPSG:3857',
+						units: 'm'
+					}),
+					center: center,
+        			zoom: 5
+				})
+			});
+            var _style = new ol.style.Style({
+                image: new ol.style.Circle({
+                    radius: 7,
+                    fill: new ol.style.Fill({
+                        color: [0, 153, 255, 1]
+                    }),
+                    stroke: new ol.style.Stroke({
+                        color: [255, 255, 255, 0.75],
+                        width: 1.5
+                    })
+                }),
+                fill: new ol.style.Fill({
+                    color: 'rgba(0, 0, 255, 0.3)'
+                }),
+                stroke: new ol.style.Stroke({
+                    color: '#55a6ff',
+                    width: 3,
+                    lineJoin: 'round'
+                })
+            });
+            var vector = new ol.layer.Vector({
+                source: new ol.source.Vector({
+                    features: []
+                }),
+                style:_style
+            });
+            map.addLayer(vector);
+            var flag = false, feature = null, coord;
+            map.on("click", function (evt) {
+                if(flag) {
+                    if(feature){
+                        vector.getSource().removeFeature(feature);
+                        feature = null;
+                    }
+                    feature = null;
+//                    var _distance = parseFloat(prompt("请输入查询范围","200000"));
+                    var _distance = 200000;
+                    if(_distance>0){
+                        feature = new ol.Feature({
+                            geometry: new ol.geom.Circle(coord, _distance)
+                    	});
+                        vector.getSource().addFeature(feature);
+					}
+                }
+            });
+            map.on('pointermove', function(evt) {
+                var view = map.getView();
+                var viewResolution = view.getResolution();
+                var _data = [
+                    {
+                        "type": "Feature",
+                        "id": "capital.1",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                87.57607938,
+                                43.7822252
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 87.576079383,
+                            "y": 43.7822252036
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.2",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                91.1632179,
+                                29.71055973
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 91.1632178976,
+                            "y": 29.7105597282
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.3",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                101.79743904,
+                                36.59372483
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 101.797439042,
+                            "y": 36.5937248286
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.4",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                103.58442066,
+                                36.11917453
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 103.584420659,
+                            "y": 36.1191745343
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.5",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                104.0356344,
+                                30.71431481
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 104.035634403,
+                            "y": 30.71431481
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.6",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                106.51922502,
+                                29.47907323
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 106.519225022,
+                            "y": 29.4790732252
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.7",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                106.66818338,
+                                26.45748562
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 106.668183381,
+                            "y": 26.4574856176
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.8",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                102.72691473,
+                                24.96956844
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 102.72691473,
+                            "y": 24.9695684445
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.9",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                106.1673243,
+                                38.59859256
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 106.1673243,
+                            "y": 38.5985925629
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.10",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                108.96721347,
+                                34.27622125
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 108.967213466,
+                            "y": 34.276221246
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.11",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                108.23403629,
+                                22.74850214
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 108.234036288,
+                            "y": 22.7485021363
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.12",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                110.34627438,
+                                19.97015008
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 110.346274379,
+                            "y": 19.9701500776
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.13",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                113.22675512,
+                                23.1832771
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 113.226755116,
+                            "y": 23.1832770959
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.14",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                112.94799576,
+                                28.17008188
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 112.947995764,
+                            "y": 28.1700818808
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.15",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                115.89376225,
+                                28.65252858
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 115.893762253,
+                            "y": 28.6525285819
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.16",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                119.24679821,
+                                26.07095583
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 119.24679821,
+                            "y": 26.0709558302
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.17",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                121.50358486,
+                                25.00847585
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 121.50358486,
+                            "y": 25.008475846
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.18",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                120.18306242,
+                                30.3307424
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 120.183062425,
+                            "y": 30.3307423978
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.19",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                121.44971306,
+                                31.2535144
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 121.449713061,
+                            "y": 31.2535143977
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.20",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                114.21665206,
+                                30.57940065
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 114.216652064,
+                            "y": 30.5794006512
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.21",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                117.26233421,
+                                31.83849486
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 117.262334214,
+                            "y": 31.8384948639
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.22",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                118.80571398,
+                                32.08516419
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 118.805713981,
+                            "y": 32.0851641858
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.23",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                113.65115064,
+                                34.74641921
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 113.651150642,
+                            "y": 34.7464192093
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.24",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                117.04835397,
+                                36.60851084
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 117.048353974,
+                            "y": 36.6085108426
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.25",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                114.47825266,
+                                38.03336125
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 114.478252663,
+                            "y": 38.0333612473
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.26",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                112.48311906,
+                                37.7984878
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 112.483119061,
+                            "y": 37.798487801
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.27",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                111.84285565,
+                                40.89580653
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 111.842855648,
+                            "y": 40.8958065302
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.28",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                117.35110819,
+                                38.92580064
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 117.351108195,
+                            "y": 38.9258006402
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.29",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                123.29626004,
+                                41.80167446
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 123.296260036,
+                            "y": 41.8016744624
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.30",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                125.26135736,
+                                43.98204084
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 125.261357358,
+                            "y": 43.9820408443
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.31",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                126.56705608,
+                                45.69385655
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 126.567056078,
+                            "y": 45.6938565538
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.32",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                116.06829681,
+                                39.89229689
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 116.068296813,
+                            "y": 39.8922968887
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.33",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                114.09318425,
+                                22.42806599
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 114.093184252,
+                            "y": 22.4280659909
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "id": "capital.34",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                113.55255358,
+                                22.18470971
+                            ]
+                        },
+                        "geometry_name": "the_geom",
+                        "properties": {
+                            "x": 113.552553581,
+                            "y": 22.184709711
+                        }
+                    }
+                ];
+                var _coord = evt.coordinate;
+                var _c = new ol.geom.Circle(_coord, viewResolution*6);
+                for(var i=0;i<_data.length;i++){
+                    var _d = _data[i];
+                    var _lonlat = [_d.properties.x, _d.properties.y];
+					coord = ol.proj.transform(_lonlat,'EPSG:4326','EPSG:3857');
+					if(_c.intersectsCoordinate(coord)){
+                        map.getViewport().style.cursor="pointer";
+                        addCityName(_d);
+                        flag = true;
+                        break;
+					}else{
+                        flag = false;
+                        $(".city-name").remove();
+                        map.getViewport().style.cursor="default";
+					}
+				}
+            });
+            function addCityName(d){
+                $(".city-name").remove();
+                var _scrPt = map.getPixelFromCoordinate(coord);
+                var _label = $("<div/>").addClass("city-name").css({
+                    "top":_scrPt[1]+"px",
+                    "left":_scrPt[0]+16+"px"
+                }).html(d.properties.x.toFixed(3));
+                map.getViewport().appendChild(_label[0]);
+            }
+		}
+	</script>
+</head>
+<body onLoad="init()">
+<div id="map">
+</div>
+</body>
+</html>

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Measure</title>
+	<link rel="stylesheet" href="../../../plugin/ol4/ol.css" type="text/css">
+	<!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+	<script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+	<script src="../../../plugin/ol4/ol.js"></script>
+	<script type="text/javascript" src="../../../plugin/jquery/jquery-1.8.3.js"></script>
+	<style>
+		html, body, #map{
+			margin: 0;
+			padding: 0;
+			overflow: hidden;
+			width: 100%;
+			height: 100%;
+		}
+		.form-inline{
+			position: absolute;
+			top:15px;
+			right: 15px;
+			z-index: 9;
+			background: #ffffff;
+			border:1px solid #ccc;
+			padding: 3px;
+		}
+		.tooltip {
+			position: relative;
+			border-radius: 4px;
+			color: black;
+			padding: 4px 8px;
+			opacity: 0.9;
+			white-space: nowrap;
+			border:1px solid #00c7d7;
+			background: #ffffff;
+		}
+		.tooltip-measure {
+			opacity: 1;
+			font-weight: bold;
+			background: #ffffff;
+		}
+		.tooltip-static {
+			background-color: #ffcc33;
+			color: black;
+			border: 1px solid white;
+		}
+		.tooltip-measure:before,
+		.tooltip-static:before {
+			border-top: 6px solid #00c7d7;
+			border-right: 6px solid transparent;
+			border-left: 6px solid transparent;
+			content: "";
+			position: absolute;
+			bottom: -6px;
+			margin-left: -7px;
+			left: 50%;
+		}
+		.tooltip-static:before {
+			border-top-color: #ffcc33;
+		}
+	</style>
+</head>
+<body>
+<div id="map" class="map"></div>
+<form class="form-inline">
+	<label>测量类型 &nbsp;</label>
+	<select id="type">
+		<option value="length">距离</option>
+		<option value="area">面积</option>
+	</select>
+</form>
+<script>
+    var source = new ol.source.Vector();
+    var vector = new ol.layer.Vector({
+        source: source,
+        style: new ol.style.Style({
+            fill: new ol.style.Fill({
+                color: 'rgba(255, 255, 255, 0.3)'
+            }),
+            stroke: new ol.style.Stroke({
+                color: '#ffcc33',
+                width: 2
+            }),
+            image: new ol.style.Circle({
+                radius: 7,
+                fill: new ol.style.Fill({
+                    color: '#ffcc33'
+                })
+            })
+        })
+    });
+    var sketch;
+    var helpTooltipElement;
+    var helpTooltip;
+    var measureTooltipElement;
+    var measureTooltip;
+    var continuePolygonMsg = '点击继续绘制测量面积';
+    var continueLineMsg = '点击继续绘制测量距离';
+    var pointerMoveHandler = function(evt) {
+        if (evt.dragging) {
+            return;
+        }
+        /** @type {string} */
+        var helpMsg = '点击开始测量';
+        if (sketch) {
+            var geom = (sketch.getGeometry());
+            if (geom instanceof ol.geom.Polygon) {
+                helpMsg = continuePolygonMsg;
+            } else if (geom instanceof ol.geom.LineString) {
+                helpMsg = continueLineMsg;
+            }
+        }
+        helpTooltipElement.innerHTML = helpMsg;
+        helpTooltip.setPosition(evt.coordinate);
+        helpTooltipElement.classList.remove('hidden');
+    };
+    var vec_w = getTdtLayer("img_w");
+    var cva_w = getTdtLayer("cva_w");
+    var tiled = new ol.layer.Image({
+        source: new ol.source.ImageWMS({
+            ratio: 1,
+            url: 'http://1886xb2990.iask.in:36655/arcgis/services/test_cgs2000/jcq_cgs2000/MapServer/WMSServer',
+            params: {
+                'FORMAT': 'image/png',
+                'VERSION': '1.1.1',
+                LAYERS: '0',
+                STYLES: ''
+            }
+        }),
+		opacity:0.6
+    });
+    var center = ol.proj.transform([103.847, 36.0473],'EPSG:4326','EPSG:3857');
+    var map = new ol.Map({
+        layers: [vec_w, cva_w, tiled, vector],
+        target: 'map',
+        view: new ol.View({
+            center: [12577713.642017495, 2971206.770222437],
+            zoom: 16
+        })
+    });
+    map.on('pointermove', pointerMoveHandler);
+    map.getViewport().addEventListener('mouseout', function() {
+        helpTooltipElement.classList.add('hidden');
+    });
+    var typeSelect = document.getElementById('type');
+    var draw; // global so we can remove it later
+    var formatLength = function(line) {
+        var length = ol.Sphere.getLength(line);
+        var output;
+        if (length > 100) {
+            output = (Math.round(length / 1000 * 100) / 100) +
+                ' ' + 'km';
+        } else {
+            output = (Math.round(length * 100) / 100) +
+                ' ' + 'm';
+        }
+        return output;
+    };
+    var formatArea = function(polygon) {
+        var area1 = getArea(polygon);
+        var area = ol.Sphere.getArea(polygon);
+        var output;
+        if (area > 10000) {
+            output = (Math.round(area / 1000000 * 100) / 100) +
+                ' ' + '<sup>2</sup>';
+        } else {
+            output = (Math.round(area * 100) / 100) +
+                ' ' + 'm<sup>2</sup>';
+        }
+        return output;
+    };
+    function getArea(polygon) {
+        var coordinates = polygon.getCoordinates();
+        radius = 6371008.8;
+        var area = 0, len = coordinates.length;
+        var x1 = coordinates[len - 1][0];
+        var y1 = coordinates[len - 1][1];
+        for (var i = 0; i < len; i++) {
+            var x2 = coordinates[i][0], y2 = coordinates[i][1];
+            area += toRadians(x2 - x1) *
+                (2 + Math.sin(toRadians(y1)) +
+                Math.sin(toRadians(y2)));
+            x1 = x2;
+            y1 = y2;
+        }
+        return area * radius * radius / 2.0;
+    };
+    function toRadians(angleInDegrees) {
+        return angleInDegrees * Math.PI / 180;
+    };
+    function addInteraction() {
+        var type = (typeSelect.value == 'area' ? 'Polygon' : 'LineString');
+        draw = new ol.interaction.Draw({
+            source: source,
+            type: /** @type {ol.geom.GeometryType} */ (type),
+            style: new ol.style.Style({
+                fill: new ol.style.Fill({
+                    color: 'rgba(255, 255, 255, 0.2)'
+                }),
+                stroke: new ol.style.Stroke({
+                    color: 'rgba(0, 0, 0, 0.5)',
+                    lineDash: [10, 10],
+                    width: 2
+                }),
+                image: new ol.style.Circle({
+                    radius: 5,
+                    stroke: new ol.style.Stroke({
+                        color: 'rgba(0, 0, 0, 0.7)'
+                    }),
+                    fill: new ol.style.Fill({
+                        color: 'rgba(255, 255, 255, 0.2)'
+                    })
+                })
+            })
+        });
+        map.addInteraction(draw);
+        createMeasureTooltip();
+        createHelpTooltip();
+        var listener;
+        draw.on('drawstart',
+            function(evt) {
+                sketch = evt.feature;
+                var tooltipCoord = evt.coordinate;
+                listener = sketch.getGeometry().on('change', function(evt) {
+                    var geom = evt.target;
+                    var output;
+                    if (geom instanceof ol.geom.Polygon) {
+                        output = formatArea(geom);
+                        tooltipCoord = geom.getInteriorPoint().getCoordinates();
+                    } else if (geom instanceof ol.geom.LineString) {
+                        output = formatLength(geom);
+                        tooltipCoord = geom.getLastCoordinate();
+                    }
+                    measureTooltipElement.innerHTML = output;
+                    measureTooltip.setPosition(tooltipCoord);
+                });
+            }, this);
+        draw.on('drawend',
+            function(evt) {
+                measureTooltipElement.className = 'tooltip tooltip-static measure-result';
+                measureTooltip.setOffset([0, -7]);
+                // unset sketch
+                sketch = null;
+                // unset tooltip so that a new one can be created
+                measureTooltipElement = null;
+                createMeasureTooltip();
+                ol.Observable.unByKey(listener);
+                map.removeInteraction(draw);
+                $(helpTooltipElement).parent().hide();
+                evt.stopPropagation();
+            }, this);
+    }
+    function createHelpTooltip() {
+        if (helpTooltipElement) {
+            helpTooltipElement.parentNode.removeChild(helpTooltipElement);
+        }
+        helpTooltipElement = document.createElement('div');
+        helpTooltipElement.className = 'tooltip hidden';
+        helpTooltip = new ol.Overlay({
+            element: helpTooltipElement,
+            offset: [15, 0],
+            positioning: 'center-left'
+        });
+        map.addOverlay(helpTooltip);
+    }
+    function createMeasureTooltip() {
+        if (measureTooltipElement) {
+            measureTooltipElement.parentNode.removeChild(measureTooltipElement);
+        }
+        measureTooltipElement = document.createElement('div');
+        measureTooltipElement.className = 'tooltip tooltip-measure';
+        measureTooltip = new ol.Overlay({
+            element: measureTooltipElement,
+            offset: [0, -15],
+            positioning: 'bottom-center'
+        });
+        map.addOverlay(measureTooltip);
+    }
+    function getTdtLayer(lyr){
+        var url = "http://t0.tianditu.com/DataServer?T="+lyr+"&X={x}&Y={y}&L={z}";
+        var layer = new ol.layer.Tile({
+            source: new ol.source.XYZ({
+                url:url
+            })
+        });
+        return layer;
+    }
+    typeSelect.onchange = function() {
+        map.removeInteraction(draw);
+        source.clear();
+        $(".measure-result").parent().remove();
+        addInteraction();
+    };
+    addInteraction();
+</script>
+</body>
+</html>

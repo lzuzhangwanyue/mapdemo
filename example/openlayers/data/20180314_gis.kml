@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document id="Created by MROBS 1.0">
+    <Style id="1">
+      <LabelStyle>
+        <color>ff000000</color>
+        <colorMode>normal</colorMode>
+        <scale>1.0</scale>
+      </LabelStyle>
+      <LineStyle>
+        <color>ff000000</color>
+        <colorMode>normal</colorMode>
+        <linecoding>1</linecoding>
+        <width>1</width>
+      </LineStyle>
+    </Style>
+      <LabelStyle>
+        <color>ff0000ff</color>
+        <colorMode>normal</colorMode>
+        <angle>0</angle>
+        <scale>1.0</scale>
+      </LabelStyle>
+	 <Style id="2">
+      <LineStyle>
+        <color>ff0000ff</color>
+        <colorMode>nromal</colorMode>
+        <linecoding>1</linecoding>
+        <width>1</width>
+      </LineStyle>
+    </Style>
+    <Placemark>
+      <name>100</name>
+      <styleUrl>#1</styleUrl>
+      <LookAt>
+      				<longitude>89.34875</longitude>
+      				<latitude>61.89474</latitude>
+      				<altitude>0</altitude>
+      				<heading>5.983100439035095e-011</heading>
+      				<tilt>44.99947268080893</tilt>
+      				<range>1000.001330829586</range>
+      				<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>
+      			</LookAt>
+      <LinearRing>
+        <tessellate>1</tessellate>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates>89.34875,61.89474,0 90.81706,62.38187,0 89.83909,63.05491,0 88.67949,62.57677,0 89.34875,61.89474,0 </coordinates>
+      </LinearRing>
+    </Placemark>
+    <Placemark>
+      <name>100</name>
+      <code>code100</code>
+      <styleUrl>#1</styleUrl>
+      <LinearRing>
+        <tessellate>1</tessellate>
+        <altitudeMode>clampToGround</altitudeMode>
+        <coordinates>97.91332,63.10554,0 101.6036,62.56658,0 102.4307,62.68404,0 104.5588,64.20547,0 103.8579,65.22563,0 99.77107,65.62778,0 97.9643,65.19837,0 97.47694,63.43368,0 97.91332,63.10554,0 </coordinates>
+      </LinearRing>
+    </Placemark>
+   
+  </Document>
+</kml>

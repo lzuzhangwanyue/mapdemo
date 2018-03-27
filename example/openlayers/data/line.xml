@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="GBK"?>
+<sld:StyledLayerDescriptor xmlns="http://www.opengis.net/sld" xmlns:sld="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml" version="1.0.0">
+    <sld:UserLayer>
+        <sld:LayerFeatureConstraints>
+            <sld:FeatureTypeConstraint/>
+        </sld:LayerFeatureConstraints>
+        <sld:UserStyle>
+            <sld:Name>layer lines</sld:Name>
+            <sld:Title/>
+            <sld:FeatureTypeStyle>
+                <sld:Name>group 0</sld:Name>
+                <sld:FeatureTypeName>Feature</sld:FeatureTypeName>
+                <sld:SemanticTypeIdentifier>generic:geometry</sld:SemanticTypeIdentifier>
+                <sld:SemanticTypeIdentifier>colorbrewer:unique:dynamic rainbow</sld:SemanticTypeIdentifier>
+                <sld:Rule>
+                    <sld:Name>35</sld:Name>
+                    <sld:Title>35</sld:Title>
+                    <ogc:Filter>
+                        <ogc:PropertyIsEqualTo>
+                            <ogc:PropertyName>voltage</ogc:PropertyName>
+                            <ogc:Literal>35</ogc:Literal>
+                        </ogc:PropertyIsEqualTo>
+                    </ogc:Filter>
+                    <sld:LineSymbolizer>
+                        <sld:Stroke>
+                            <sld:CssParameter name="stroke">#CC33FF</sld:CssParameter>
+                        </sld:Stroke>
+                    </sld:LineSymbolizer>
+                </sld:Rule>
+                <sld:Rule>
+                    <sld:Name>35-label</sld:Name>
+                    <sld:MaxScaleDenominator>68247.34668319309</sld:MaxScaleDenominator>
+                    <ogc:Filter>
+                        <ogc:PropertyIsEqualTo>
+                            <ogc:PropertyName>voltage</ogc:PropertyName>
+                            <ogc:Literal>35</ogc:Literal>
+                        </ogc:PropertyIsEqualTo>
+                    </ogc:Filter>
+                    <sld:TextSymbolizer>
+                        <sld:Label>
+                            <ogc:PropertyName>name</ogc:PropertyName>
+                        </sld:Label>
+                        <sld:Font>
+                            <sld:CssParameter name="font-family">宋体</sld:CssParameter>
+                            <sld:CssParameter name="font-size">13.0</sld:CssParameter>
+                            <sld:CssParameter name="font-style">normal</sld:CssParameter>
+                            <sld:CssParameter name="font-weight">bold</sld:CssParameter>
+                        </sld:Font>
+                        <sld:LabelPlacement>
+                            <sld:LinePlacement>
+                                <sld:PerpendicularOffset>10.0</sld:PerpendicularOffset>
+                            </sld:LinePlacement>
+                        </sld:LabelPlacement>
+                        <sld:Halo>
+                            <sld:Radius>1</sld:Radius>
+                            <sld:Fill>
+                                <sld:CssParameter name="fill">#ffffff</sld:CssParameter>
+                            </sld:Fill>
+                        </sld:Halo>
+                        <sld:Fill>
+                            <sld:CssParameter name="fill">#CC33FF</sld:CssParameter>
+                        </sld:Fill>
+                        <sld:Priority>500</sld:Priority>
+                        <sld:VendorOption name="followLine">true</sld:VendorOption>
+                        <sld:VendorOption name="repeat">250</sld:VendorOption>
+                        <sld:VendorOption name="group">yes</sld:VendorOption>
+                        <sld:VendorOption name="maxDisplacement">100</sld:VendorOption>
+                    </sld:TextSymbolizer>
+                </sld:Rule>
+                <sld:Rule>
+                    <sld:Name>110</sld:Name>
+                    <sld:Title>110</sld:Title>
+                    <ogc:Filter>
+                        <ogc:PropertyIsEqualTo>
+                            <ogc:PropertyName>voltage</ogc:PropertyName>
+                            <ogc:Literal>110</ogc:Literal>
+                        </ogc:PropertyIsEqualTo>
+                    </ogc:Filter>
+                    <sld:LineSymbolizer>
+                        <sld:Stroke>
+                            <sld:CssParameter name="stroke">#FF33CC</sld:CssParameter>
+                            <sld:CssParameter name="stroke-width">1.5</sld:CssParameter>
+                        </sld:Stroke>
+                    </sld:LineSymbolizer>
+                </sld:Rule>
+                <sld:Rule>
+                    <sld:Name>110-label</sld:Name>
+                    <ogc:Filter>
+                        <ogc:PropertyIsEqualTo>
+                            <ogc:PropertyName>voltage</ogc:PropertyName>
+                            <ogc:Literal>110</ogc:Literal>
+                        </ogc:PropertyIsEqualTo>
+                    </ogc:Filter>
+                    <sld:MaxScaleDenominator>68247.34668319309</sld:MaxScaleDenominator>
+                    <sld:TextSymbolizer>
+                        <sld:Label>
+                            <ogc:PropertyName>name</ogc:PropertyName>
+                        </sld:Label>
+                        <sld:Font>
+                            <sld:CssParameter name="font-family">宋体</sld:CssParameter>
+                            <sld:CssParameter name="font-size">13.0</sld:CssParameter>
+                            <sld:CssParameter name="font-style">normal</sld:CssParameter>
+                            <sld:CssParameter name="font-weight">bold</sld:CssParameter>
+                        </sld:Font>
+                        <sld:LabelPlacement>
+                            <sld:LinePlacement>
+                                <sld:PerpendicularOffset>10.0</sld:PerpendicularOffset>
+                            </sld:LinePlacement>
+                        </sld:LabelPlacement>
+                        <sld:Halo>
+                            <sld:Radius>1</sld:Radius>
+                            <sld:Fill>
+                                <sld:CssParameter name="fill">#ffffff</sld:CssParameter>
+                            </sld:Fill>
+                        </sld:Halo>
+                        <sld:Fill>
+                            <sld:CssParameter name="fill">#FF33CC</sld:CssParameter>
+                        </sld:Fill>
+                        <sld:Priority>500</sld:Priority>
+                        <sld:VendorOption name="followLine">true</sld:VendorOption>
+                        <sld:VendorOption name="repeat">250</sld:VendorOption>
+                        <sld:VendorOption name="group">yes</sld:VendorOption>
+                        <sld:VendorOption name="maxDisplacement">100</sld:VendorOption>
+                    </sld:TextSymbolizer>
+                </sld:Rule>
+                <sld:Rule>
+                    <sld:Name>220</sld:Name>
+                    <sld:Title>220</sld:Title>
+                    <ogc:Filter>
+                        <ogc:PropertyIsEqualTo>
+                            <ogc:PropertyName>voltage</ogc:PropertyName>
+                            <ogc:Literal>220</ogc:Literal>
+                        </ogc:PropertyIsEqualTo>
+                    </ogc:Filter>
+                    <sld:LineSymbolizer>
+                        <sld:Stroke>
+                            <sld:CssParameter name="stroke">#FF6633</sld:CssParameter>
+                            <sld:CssParameter name="stroke-width">2.0</sld:CssParameter>
+                        </sld:Stroke>
+                    </sld:LineSymbolizer>
+                </sld:Rule>
+                <sld:Rule>
+                    <sld:Name>220-label</sld:Name>
+                    <ogc:Filter>
+                        <ogc:PropertyIsEqualTo>
+                            <ogc:PropertyName>voltage</ogc:PropertyName>
+                            <ogc:Literal>220</ogc:Literal>
+                        </ogc:PropertyIsEqualTo>
+                    </ogc:Filter>
+                    <sld:MaxScaleDenominator>68247.34668319309</sld:MaxScaleDenominator>
+                    <sld:TextSymbolizer>
+                        <sld:Label>
+                            <ogc:PropertyName>name</ogc:PropertyName>
+                        </sld:Label>
+                        <sld:Font>
+                            <sld:CssParameter name="font-family">宋体</sld:CssParameter>
+                            <sld:CssParameter name="font-size">13.0</sld:CssParameter>
+                            <sld:CssParameter name="font-style">normal</sld:CssParameter>
+                            <sld:CssParameter name="font-weight">bold</sld:CssParameter>
+                        </sld:Font>
+                        <sld:LabelPlacement>
+                            <sld:LinePlacement>
+                                <sld:PerpendicularOffset>10.0</sld:PerpendicularOffset>
+                            </sld:LinePlacement>
+                        </sld:LabelPlacement>
+                        <sld:Halo>
+                            <sld:Radius>1</sld:Radius>
+                            <sld:Fill>
+                                <sld:CssParameter name="fill">#ffffff</sld:CssParameter>
+                            </sld:Fill>
+                        </sld:Halo>
+                        <sld:Fill>
+                            <sld:CssParameter name="fill">#FF6633</sld:CssParameter>
+                        </sld:Fill>
+                        <sld:Priority>500</sld:Priority>
+                        <sld:VendorOption name="followLine">true</sld:VendorOption>
+                        <sld:VendorOption name="repeat">250</sld:VendorOption>
+                        <sld:VendorOption name="group">yes</sld:VendorOption>
+                        <sld:VendorOption name="maxDisplacement">100</sld:VendorOption>
+                    </sld:TextSymbolizer>
+                </sld:Rule>
+                <sld:Rule>
+                    <sld:Name>500</sld:Name>
+                    <sld:Title>500</sld:Title>
+                    <ogc:Filter>
+                        <ogc:PropertyIsEqualTo>
+                            <ogc:PropertyName>voltage</ogc:PropertyName>
+                            <ogc:Literal>500</ogc:Literal>
+                        </ogc:PropertyIsEqualTo>
+                    </ogc:Filter>
+                    <sld:LineSymbolizer>
+                        <sld:Stroke>
+                            <sld:CssParameter name="stroke">#FF3366</sld:CssParameter>
+                            <sld:CssParameter name="stroke-width">3.0</sld:CssParameter>
+                        </sld:Stroke>
+                    </sld:LineSymbolizer>
+                </sld:Rule>
+                <sld:Rule>
+                    <sld:Name>500-label</sld:Name>
+                    <ogc:Filter>
+                        <ogc:PropertyIsEqualTo>
+                            <ogc:PropertyName>voltage</ogc:PropertyName>
+                            <ogc:Literal>500</ogc:Literal>
+                        </ogc:PropertyIsEqualTo>
+                    </ogc:Filter>
+                    <sld:MaxScaleDenominator>68247.34668319309</sld:MaxScaleDenominator>
+                    <sld:TextSymbolizer>
+                        <sld:Label>
+                            <ogc:PropertyName>name</ogc:PropertyName>
+                        </sld:Label>
+                        <sld:Font>
+                            <sld:CssParameter name="font-family">宋体</sld:CssParameter>
+                            <sld:CssParameter name="font-size">13.0</sld:CssParameter>
+                            <sld:CssParameter name="font-style">normal</sld:CssParameter>
+                            <sld:CssParameter name="font-weight">bold</sld:CssParameter>
+                        </sld:Font>
+                        <sld:LabelPlacement>
+                            <sld:LinePlacement>
+                                <sld:PerpendicularOffset>10.0</sld:PerpendicularOffset>
+                            </sld:LinePlacement>
+                        </sld:LabelPlacement>
+                        <sld:Halo>
+                            <sld:Radius>1</sld:Radius>
+                            <sld:Fill>
+                                <sld:CssParameter name="fill">#ffffff</sld:CssParameter>
+                            </sld:Fill>
+                        </sld:Halo>
+                        <sld:Fill>
+                            <sld:CssParameter name="fill">#FF3366</sld:CssParameter>
+                        </sld:Fill>
+                        <sld:Priority>500</sld:Priority>
+                        <sld:VendorOption name="followLine">true</sld:VendorOption>
+                        <sld:VendorOption name="repeat">250</sld:VendorOption>
+                        <sld:VendorOption name="group">yes</sld:VendorOption>
+                        <sld:VendorOption name="maxDisplacement">100</sld:VendorOption>
+                    </sld:TextSymbolizer>
+                </sld:Rule>
+            </sld:FeatureTypeStyle>
+        </sld:UserStyle>
+    </sld:UserLayer>
+</sld:StyledLayerDescriptor>

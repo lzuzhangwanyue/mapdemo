@@ -1,0 +1,98 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>cluster</title>
+	<link rel="stylesheet" type="text/css" href="../../../plugin/ol3/css/ol.css"/>
+	<style type="text/css">
+		body, #map {
+			border: 0px;
+			margin: 0px;
+			padding: 0px;
+			width: 100%;
+			height: 100%;
+			font-size: 13px;
+		}
+	</style>
+	<script type="text/javascript" src="../../../plugin/ol3/build/ol-debug.js"></script>
+	<script type="text/javascript" src="../../../plugin/jquery/jquery-1.8.3.js"></script>
+	<script type="text/javascript">
+		var map;//[104.21390114106414, 35.847595169932646]
+		var data = [{name:"乌鲁木齐",x:87.5758285931,y:43.7822116460,count:10},
+			{name:"拉萨",x:91.1629975040,y:29.7104204643,count:30},
+			{name:"西宁",x:101.797302689,y:36.5936423859,count:50},
+			{name:"兰州",x:103.584297498,y:36.1190864503,count:70},
+			{name:"成都",x:104.035508297,y:30.7141790950,count:90},
+			{name:"重庆",x:106.519115206,y:29.4789248520,count:60},
+			{name:"贵阳",x:106.668071385,y:26.4573115457,count:20}];
+		function init() {
+            var format = 'image/png';
+            var bounds = [73.4510046356223, 18.1632471876417,
+                134.976797646506, 53.5319431522236];
+            var untiled = new ol.layer.Image({
+                source: new ol.source.ImageWMS({
+                    ratio: 1,
+                    url: 'http://192.168.10.185:8086/geoserver/lzugis/wms',
+                    params: {
+                        'FORMAT': format,
+                        'VERSION': '1.1.1',
+                        LAYERS: 'lzugis:province',
+                        STYLES: ''
+                    },
+                    serverType: 'geoserver'//在新版本中是必须的参数
+                })
+            });
+            var projection = new ol.proj.Projection({
+                code: 'EPSG:4326',
+                units: 'degrees'
+            });
+
+            var iconStyle = function () {
+                var zoom = map.getView().getZoom();
+                var scale = zoom/10;
+                if(scale<0.3)scale=0.3;
+                return new ol.style.Style({
+                    image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+                        anchor: [0, 0],
+                        anchorXUnits: 'fraction',
+                        anchorYUnits: 'pixels',
+						scale:scale,
+                        src: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA3FpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDE0IDc5LjE1MTQ4MSwgMjAxMy8wMy8xMy0xMjowOToxNSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo0MGI0YTUwNC0wNjAxLWJkNGQtYTM4NC1hNTQ3ZTNhMDQ4Y2UiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6RjgxMzQ5ODhFOTQwMTFFNzk0QkFEMTZBQzVEMjFFOTQiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6RjgxMzQ5ODdFOTQwMTFFNzk0QkFEMTZBQzVEMjFFOTQiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChXaW5kb3dzKSI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjQwYjRhNTA0LTA2MDEtYmQ0ZC1hMzg0LWE1NDdlM2EwNDhjZSIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo0MGI0YTUwNC0wNjAxLWJkNGQtYTM4NC1hNTQ3ZTNhMDQ4Y2UiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz7MYbYZAAAD40lEQVR42pRWXUxURxSemV1YNrt3cbHK2sWyZkF8UAuJsfWl0hjTl5qoQJo+gVFjjFERq8anYnwgra0/qcbYPggPPqiLkpCYkmqANDGatPUnxvAru8DCsgK79142LLB7xzlX5rrcvbvSSW5m7jkz35kz58x3BqMszbZ7phwTWkuQshth7FmipNSvINJGFdwSa7M/z4SBjYT2arkSU/ojU1aiZTSKUBfF+NyMT+jKaIBSqvb5VVI92+0lLv90xbx8oWZ6vMSFctetFT4B2dCIPDkQQvOn7hasGYvmCimm6kWf44oKjHG6AUe13MwEtRz44Zmo6C71FmXbfc+Lfv+e3wpWckMMpllqFfZxA1pz7BXrHVUShe9g0/CQshBX6DIbzIU1fD1gLTkiOHNCaSeMv9sS9d/4YXUxNlvS4jM3HZqB3lLgsqfFITFHD/0SDtz+Z4WaDArGX2sxEfZKXWB5w/5JyWjn8alx+UFHXx/fIYxBZuQJYMAcoUpSN4whFU0m5Rn8vG4Kj+rP/Mnj/oFvLrpKjM7/r5Ohwa3bSr36mHxx3qV6kUySCoJNtI4HVQ8e7B8c5eBNdZb2nj/sj+GDMch2/urywpzUNRs+L/UAlrp7wGYB8YNL7X/29epd5u72jCQf6nUgA93GA29FvQ6wFoM9ZGYJWwzWIM/1AR2L2gTPahwsKyI7xqbof+1PE0HQ1Xxl9oAMdP6wxQ1zUwOvYbHbb+ZCfol4i8XiMUYW9rK1prfs113/e5x0/JvYBbpHL8zP75y1ItD5wwn3wkJiwZKytshlzedjkpGHbHk26PtHk6rhmyesVq5raXgP0DuSXAV9To45JxOOZgCuf6oCXIZgvZmgRX+/SnTb8lAZ11ktaB3I/GHqhjn6ezEamhU/GKA0AAPgFr31+0enp6D/tnF2u31PrEI7vjjqBRmMgU706zQshk0UTNpgfNbndOknQsrdOhjqYzPFJDJFNbb9Hn3JOKe7oyE0YMRVQILvbzNpIzSJm+FnOGJx6HMaWmW5dRWi5FIuSdRqvEVmjmOEOzd6rSuNyE8jPoaNOVUw8tv+mXNOenldEFJ5KL9azloLRJ+whI82H5Zl2Cx4KN9zVKppSgluZAWmExRHLk74rzUUamQXvCZGUoOG0tJRcHJwtjYwHHF6OGZGuj78U+B/0zWsyUjXRgUHjqv1WDSyflNJ8ccKTs1VZwF4v1g+WySfUGdY0YxKJhj6uSYy4V2Dc92FeSpIcCIuDY7T+dN3nYUceBHkhNjquGxYMtOKvkIbIfDLKvosoHDmWYt+xmcLo1xC1WdLsQ41AHkOqZjt2fJOgAEAasO05lKOansAAAAASUVORK5CYII="
+                    }))
+                });
+            }
+			var features = new Array();
+			for(var i=0;i<data.length;i++){
+				var d = data[i];
+				var iconFeature = new ol.Feature({
+					geometry: new ol.geom.Point([d.x, d.y]),
+					name: d.name,
+					population: d.count
+				});
+				iconFeature.setStyle(iconStyle);
+				features.push(iconFeature);
+			}
+			var vectorSource = new ol.source.Vector({
+				features: features
+			});
+			var vectorLayer = new ol.layer.Vector({
+				source: vectorSource
+			});
+			map = new ol.Map({
+				controls: ol.control.defaults({
+					attribution: false
+				}),
+				target: 'map',
+				layers: [untiled,vectorLayer],
+				view: new ol.View({
+					projection: projection
+				})
+			});
+			map.getView().fit(bounds, map.getSize());
+		}
+	</script>
+</head>
+<body onLoad="init()">
+<div id="map">
+</div>
+</body>
+</html>

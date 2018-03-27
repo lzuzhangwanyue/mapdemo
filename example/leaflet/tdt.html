@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>leaflet</title>
+    <link rel="stylesheet" href="../../plugin/leaflet/leaflet.css" type="text/css">
+    <style>
+        html, body, #map {
+            height: 100%;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+    <script src="../../plugin/jquery/jquery-1.8.3.js"></script>
+    <script src="../../plugin/leaflet/leaflet.js"></script>
+    <script>
+        var map;
+        function getTdtLyr(lyr){
+//          var url = "http://localhost:8081/tile/tdttile";
+            var url = "http://t2.tianditu.com/DataServer";
+        	return L.tileLayer(url+'?T='+lyr+'&X={x}&Y={y}&L={z}', {
+		        maxZoom: 18
+		    });
+        }
+        $(window).load(function() {
+			/**
+			 * 天地图地图类型说明
+			 ______________________________
+			     图层名称  |  说明
+	            vec_c  | 矢量
+	            img_c  | 影像
+	            ter_c  | 地形
+	            cva_c  | 注记
+	            eva_c  | 英文注记
+	            cia_c  | 路网
+	            eia_c  | 英文路网
+	         ————————————————————————
+             */
+		    var vec_c = getTdtLyr("vec_w");
+		    var cva_c = getTdtLyr("cva_w");
+			map = L.map('map',{
+				crs:L.CRS.EPSG3857,
+				center: {lon:103.847 , lat:36.0473},
+				zoom: 4
+			})
+			map.addLayer(vec_c);
+			var wms = L.tileLayer.wms("http://localhost:8086/geoserver/lzugis/wms", {
+                layers: 'province',
+                format: 'image/png',
+                transparent: true,
+                version:'1.1.1'
+            });
+//          map.addLayer(wms);
+            map.addLayer(cva_c);
+        });
+    </script>
+</head>
+<body>
+<div id="map"></div>
+</body>
+</html>

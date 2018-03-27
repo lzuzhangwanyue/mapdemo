@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>leaflet</title>
+    <link rel="stylesheet" href="../../plugin/leaflet/leaflet.css" type="text/css">
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+        }
+        html, body, #map {
+            height: 100%;
+        }
+        .leaflet-control-attribution{
+            display: none;
+        }
+    </style>
+    <script src="../../plugin/jquery/jquery-1.8.3.js"></script>
+    <script src="../../plugin/leaflet/leaflet.js"></script>
+    <script src="extend/layer/leaflet-heatmap-layer.js"></script>
+    <script src="data/heat_data.js"></script>
+    <script src="data/realworld.10000.js"></script>
+    <script>
+        var map;
+        $(window).load(function() {
+//          map = L.map('map').setView([35.851354460363,104.21390114103], 4);//35.851354460363,104.21390114103
+//          L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {}).addTo(map);
+//          var wms = L.tileLayer.wms("http://localhost:8086/geoserver/lzugis/wms", {
+//              layers: 'province',
+//              format: 'image/png',
+//              transparent: true,
+//              version:'1.1.1'
+//          });
+//          map.addLayer(wms);
+//          var addressPoints = testData.data;
+//          addressPoints.map(function (p) { return [p.lat, p.lon, p.count]; });
+//          var heat = L.heatLayer(addressPoints).addTo(map);
+			var map = L.map('map').setView([-37.87, 175.475], 12);
+			var tiles = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+			    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+			}).addTo(map);
+			addressPoints = addressPoints.map(function (p) { return [p[0], p[1]]; });
+			var heat = L.heatLayer(addressPoints).addTo(map);
+			
+        });
+    </script>
+</head>
+<body>
+<div id="map"></div>
+</body>
+</html>

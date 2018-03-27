@@ -1,0 +1,39 @@
+{
+    "d": [
+        {
+            "__type": "DAL.Model.T_TYSCORESTAT",
+            "YEAR": 2013,
+            "ISSUETYPE": "BABJ",
+            "INTERVALTIME": 24,
+            "OFFSET": 87.5128959078
+        },
+        {
+            "__type": "DAL.Model.T_TYSCORESTAT",
+            "YEAR": 2013,
+            "ISSUETYPE": "BABJ",
+            "INTERVALTIME": 48,
+            "OFFSET": 133.6484628901
+        },
+        {
+            "__type": "DAL.Model.T_TYSCORESTAT",
+            "YEAR": 2013,
+            "ISSUETYPE": "BABJ",
+            "INTERVALTIME": 72,
+            "OFFSET": 190.7922424647
+        },
+        {
+            "__type": "DAL.Model.T_TYSCORESTAT",
+            "YEAR": 2013,
+            "ISSUETYPE": "BABJ",
+            "INTERVALTIME": 96,
+            "OFFSET": 270.6864966155
+        },
+        {
+            "__type": "DAL.Model.T_TYSCORESTAT",
+            "YEAR": 2013,
+            "ISSUETYPE": "BABJ",
+            "INTERVALTIME": 120,
+            "OFFSET": 446.4862051828
+        }
+    ]
+}

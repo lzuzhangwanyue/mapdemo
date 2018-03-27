@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>leaflet</title>
+    <link rel="stylesheet" href="../../plugin/leaflet/leaflet.css" type="text/css">
+    <style>
+        html, body, #map {
+            height: 100%;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+    <script src="../../plugin/jquery/jquery-1.8.3.js"></script>
+    <script src="../../plugin/leaflet/leaflet.js"></script>
+    <script>
+        var map, wms;
+        function getTdtLyr(lyr){
+            var url = "http://t2.tianditu.com/DataServer";
+            return L.tileLayer(url+'?T='+lyr+'&X={x}&Y={y}&L={z}', {
+                maxZoom: 18
+            });
+        }
+        $(window).load(function() {
+            var vec_c = getTdtLyr("vec_w");
+            var cva_c = getTdtLyr("cva_w");
+            wms = L.tileLayer.wms("http://10.16.57.77:8086/geoserver/bj_grid/wms", {
+                layers: 'bj_grid:bj_layer_substation',
+                format: 'image/png',
+                transparent: true,
+                zIndex:888
+            });
+            map = L.map('map',{
+                crs:L.CRS.EPSG3857,
+                center: {lon:103.847 , lat:36.0473},
+                zoom: 4
+            });
+            map.addLayer(vec_c);
+            map.addLayer(cva_c);
+
+            var imageUrl = 'data/wind.svg';
+            var imageBounds = [
+                [37.4351, 113.207],
+                [42.7022, 119.427]
+            ];
+            L.imageOverlay(imageUrl, imageBounds, { 'opacity': 1}).addTo(map);
+            map.addLayer(wms);
+//            wms.getPane().style.zIndex = 800;
+        });
+    </script>
+</head>
+<body>
+<div id="map"></div>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Ol3 wms</title>
+	<link rel="stylesheet" type="text/css" href="../../../plugin/ol4/ol.css"/>
+	<style type="text/css">
+		body, #map {
+			border: 0px;
+			margin: 0px;
+			padding: 0px;
+			width: 100%;
+			height: 100%;
+			font-size: 13px;
+			background: #cccccc;
+		}
+		#info{
+			position: absolute;
+			top:20px;
+			right: 20px;
+			padding: 10px;
+			background: #ffffff;
+			z-index: 99;
+		}
+	</style>
+	<script type="text/javascript" src="../../../plugin/ol4/ol.js"></script>
+	<script type="text/javascript" src="../../../plugin/jquery/jquery-1.8.3.js"></script>
+</head>
+<body>
+<div id="map">
+	<div id="info"></div>
+</div>
+<script>
+    var projection = ol.proj.get('EPSG:3857');
+
+    var raster = new ol.layer.Tile({
+        source: new ol.source.BingMaps({
+            imagerySet: 'Aerial',
+            key: 'i6X3PgotncLhQMkaMFgR~cNIsCh6W3Cyx2_iUjk5wpA~AiU5YDNslsrooUQ1UcZgGF1XxLoPsATqer0A3DcCeUpe0om0eyiQEAoje_O-q4Qs'
+        })
+    });
+
+    var styleFunction = function (feat) {
+        var name = feat.get("code");
+        console.log(name);
+        return new ol.style.Style({
+            fill: new ol.style.Fill({
+                color: "rgba(0,0,0,0)"
+            }),
+            stroke: new ol.style.Stroke({
+                color: '#ff0000',
+                width: 2
+            }),
+            text: new ol.style.Text({
+                text: name,
+                fill: new ol.style.Fill({
+                    color: '#000000'
+                }),
+                stroke: new ol.style.Stroke({
+                    color: '#ffffff',
+                    width: 2
+                }),
+                textAlign: "left",
+                textBaseline: "bottom"
+            })
+        });
+    };
+
+    var vector = new ol.layer.Vector({
+        source: new ol.source.Vector({
+            url: 'data/temp.kml',
+            format: new ol.format.KML({
+                extractStyles: true
+            })
+        }),
+//        style: styleFunction
+    });
+
+    var map = new ol.Map({
+        layers: [raster, vector],
+        target: document.getElementById('map'),
+        view: new ol.View({
+            center: [-10974918.701609137, 4318297.209522276],
+            projection: projection,
+            zoom: 4
+        })
+    });
+
+    var displayFeatureInfo = function(pixel) {
+        var features = [];
+        map.forEachFeatureAtPixel(pixel, function(feature) {
+            features.push(feature);
+        });
+        if (features.length > 0) {
+            var info = [];
+            var i, ii;
+            for (i = 0, ii = features.length; i < ii; ++i) {
+                info.push(features[i].get('name'));
+            }
+            document.getElementById('info').innerHTML = info.join(', ') || '(unknown)';
+            map.getTarget().style.cursor = 'pointer';
+        } else {
+            document.getElementById('info').innerHTML = '&nbsp;';
+            map.getTarget().style.cursor = '';
+        }
+    };
+
+    map.on('pointermove', function(evt) {
+        if (evt.dragging) {
+            return;
+        }
+        var pixel = map.getEventPixel(evt.originalEvent);
+        displayFeatureInfo(pixel);
+    });
+
+    map.on('click', function(evt) {
+        displayFeatureInfo(evt.pixel);
+    });
+</script>
+</body>
+</html>

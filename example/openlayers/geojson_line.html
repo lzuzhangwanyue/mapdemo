@@ -1,0 +1,110 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Ol3 wms</title>
+	<link rel="stylesheet" href="https://openlayers.org/en/v4.4.1/css/ol.css" type="text/css">
+	<style type="text/css">
+		body, #map {
+			border: 0px;
+			margin: 0px;
+			padding: 0px;
+			width: 100%;
+			height: 100%;
+			font-size: 13px;
+		}
+		#infobox{
+			position: absolute;
+			top: 10px;
+			right: 10px;
+			z-index: 999;
+			background: #ffffff;
+			border: 1px solid #000;
+			box-shadow: 1px 1px 1px #C0C0C0;
+		}
+	</style>
+	<!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+	<script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+	<script src="https://openlayers.org/en/v4.4.1/build/ol.js"></script>
+	<script type="text/javascript" src="../../../plugin/jquery/jquery-1.8.3.js"></script>
+	<script type="text/javascript">
+		var map;
+		function init(){
+			var bounds = [73.4510046356223, 18.1632471876417,
+				134.976797646506, 53.5319431522236];
+			var projection = new ol.proj.Projection({
+				code: 'EPSG:4326',
+				units: 'degrees'
+			});
+			$.get("data/china_railway.json",null,function(result){
+				var features = (new ol.format.GeoJSON()).readFeatures(result);
+				var vectorSource = new ol.source.Vector();
+				vectorSource.addFeatures(features);
+				var vector = new ol.layer.Vector({
+					source: vectorSource,
+					opacity:1,
+					style:function(feature, resolution) {
+					    var name = feature.get("NAME");
+					    var zoom = map.getView().getZoom();
+                        var font = 'bold 8px 宋体';
+					    if(zoom<6){
+//					        name="";
+                            font = 'bold 12px 宋体';
+					    }else if(zoom>=6&&zoom<8){
+                            font = 'bold 14px 宋体';
+                        }else if(zoom>=8&&zoom<10){
+                            font = 'bold 16px 宋体';
+                        }
+                        else{
+                            font = 'bold 18px 宋体';
+                        }
+						return new ol.style.Style({
+                            image: new ol.style.RegularShape({
+                                points: 3,    // 顶点数
+                                radius: 10,    // 图形大小，单位为像素
+                                stroke: new ol.style.Stroke({ // 设置边的样式
+                                    color: 'red',
+                                    size: 2
+                                })
+                            }),
+							stroke: new ol.style.Stroke({
+						        color: '#1B9E77',
+						        width: 1.5
+						    }),
+                            text: new ol.style.Text({
+								font: font,
+                                text: name,
+                                placement: "line",
+                                exceedLength:false,
+                                fill: new ol.style.Fill({
+                                    color: '#1B9E77'
+                                }),
+                                stroke:new ol.style.Stroke({
+                                    color: '#ffffff',
+                                    width: 1
+                                })
+                            })
+						});
+					}
+				});
+				map = new ol.Map({
+					controls: ol.control.defaults({
+						attribution: false
+					}),
+					target: 'map',
+					layers: [vector],
+					view: new ol.View({
+						projection: projection
+					})
+				});
+				map.getView().fit(bounds, map.getSize());
+			});
+		}
+	</script>
+</head>
+<body onLoad="init()">
+<div id="map">
+	<div id="infobox">
+	</div>
+</div>
+</body>
+</html>

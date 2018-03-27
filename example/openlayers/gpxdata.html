@@ -1,0 +1,132 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Ol3 wms</title>
+	<link rel="stylesheet" type="text/css" href="../../../plugin/ol3/css/ol.css"/>
+	<style type="text/css">
+		body, #map {
+			border: 0px;
+			margin: 0px;
+			padding: 0px;
+			width: 100%;
+			height: 100%;
+			font-size: 13px;
+		}
+		.zoom{
+			position: absolute;
+			top: 10px;
+			right: 40px;
+			z-index: 99;
+		}
+	</style>
+	<script type="text/javascript" src="../../../plugin/ol3/build/ol.js"></script>
+	<script type="text/javascript" src="../../../plugin/jquery/jquery-1.8.3.js"></script>
+	<script type="text/javascript">
+		var map;
+		function init(){
+			var format = 'image/png';
+			var untiled = new ol.layer.Image({
+				source: new ol.source.ImageWMS({
+					ratio: 1,
+					url: 'http://localhost:6080/geoserver/bj_grid/wms',
+					params: {
+						'FORMAT': format,
+						'VERSION': '1.1.1',
+						LAYERS: 'bj_grid:china_railway_new',
+						STYLES: ''
+					},
+					serverType: 'geoserver'
+				})
+			});
+			var projection = new ol.proj.Projection({
+				code: 'EPSG:4326',
+				units: 'degrees'
+			});
+			var layers = new ol.Collection([untiled]);
+			map = new ol.Map({
+				target: 'map',
+				layers: layers,
+				view: new ol.View({
+					projection: projection,
+					center: [121.72866040097657, 24.678495092539052],
+        			zoom: 10,
+        			minResolution:0.00274658203125/8,
+        			maxResolution:1.40625
+				})
+			});
+
+			//添加GPX数据
+            var style = {
+                'Point': new ol.style.Style({
+                    image: new ol.style.Circle({
+                        fill: new ol.style.Fill({
+                            color: 'rgba(255,255,0,0.4)'
+                        }),
+                        radius: 3,
+                        stroke: new ol.style.Stroke({
+                            color: '#316cff',
+                            width: 1
+                        })
+                    })
+                }),
+                'LineString': new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                        color: '#ff2b46',
+                        width: 4
+                    })
+                }),
+                'MultiLineString': new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                        color: '#ff2b2f',
+                        width: 4
+                    })
+                })
+            };
+            var vector = new ol.layer.Vector({
+                source: new ol.source.Vector({
+                    url: 'data/gpxtest.gpx',
+                    format: new ol.format.GPX()
+                }),
+                style: function(feature) {
+                    return style[feature.getGeometry().getType()];
+                }
+            });
+            map.addLayer(vector);
+
+            // 初始化一个拉框控件
+            var dragZoom = new ol.interaction.DragZoom({
+                condition: ol.events.condition.always,
+                out: false, // 此处为设置拉框完成时放大还是缩小
+            });
+            map.addInteraction(dragZoom);
+            dragZoom.setActive(false);
+            var dragzoomActive = false;
+            dragZoom.on('boxend', function(e) {
+                dragZoom.setActive(false);
+                dragzoomActive = false;
+                map.getViewport().style.cursor="default";
+            });
+			$("#zoomin").on("click",function(){
+                dragZoom.G = false;
+                dragZoom.setActive(true);
+                dragzoomActive = true;
+                map.getViewport().style.cursor="crosshair";
+			});
+			$("#zoomout").on("click",function(){
+                dragZoom.G = true;
+                dragZoom.setActive(true);
+                dragzoomActive = true;
+                map.getViewport().style.cursor="crosshair";
+			});
+		}
+	</script>
+</head>
+<body onLoad="init()">
+<div id="map">
+	<div class="zoom">
+		<button id="zoomin">＋</button>
+		<button id="zoomout">－</button>
+	</div>
+</div>
+</body>
+</html>
