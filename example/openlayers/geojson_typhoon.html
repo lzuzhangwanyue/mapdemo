@@ -1,0 +1,118 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Ol3 wms</title>
+	<link rel="stylesheet" type="text/css" href="../../../plugin/ol3/css/ol.css"/>
+	<style type="text/css">
+		body, #map {
+			border: 0px;
+			margin: 0px;
+			padding: 0px;
+			width: 100%;
+			height: 100%;
+			font-size: 13px;
+		}
+		#infobox{
+			position: absolute;
+			top: 10px;
+			right: 10px;
+			z-index: 999;
+			background: #ffffff;
+			border: 1px solid #000;
+			box-shadow: 1px 1px 1px #C0C0C0;
+		}
+	</style>
+	<script type="text/javascript" src="../../../plugin/ol3/build/ol-debug.js"></script>
+	<script type="text/javascript" src="../../../plugin/jquery/jquery-1.8.3.js"></script>
+	<script type="text/javascript">
+		function init(){
+			var bounds = [73.4510046356223, 18.1632471876417,
+				134.976797646506, 53.5319431522236];
+			var projection = new ol.proj.Projection({
+				code: 'EPSG:4326',
+				units: 'degrees'
+			});
+
+            var vector = new ol.layer.Vector({
+                source: null,
+                opacity:0.8
+            });
+            var tiled = new ol.layer.Tile({
+                source: new ol.source.TileWMS({
+                    url: 'http://10.16.48.185:8086/geoserver/lzugis/wms',
+                    params: {'FORMAT': 'image/png',
+                        'VERSION': '1.1.1',
+                        tiled: true,
+                        LAYERS: 'lzugis:capital',
+                        STYLES: ''
+                    },
+                    serverType: 'geoserver'
+                })
+            });
+            var map = new ol.Map({
+                controls: ol.control.defaults({
+                    attribution: false
+                }),
+                target: 'map',
+                layers: [vector,tiled],
+                view: new ol.View({
+                    projection: projection
+                })
+            });
+            map.getView().fit(bounds, map.getSize());
+
+            var _index = 0, _flag = 0;
+            _flag = setInterval(function(){
+                var url = "data/typhoon/typhoon_"+_index+".json";
+                $.get(url,null,function(result){
+                    var features = (new ol.format.GeoJSON()).readFeatures(result);
+                    var vectorSource = new ol.source.Vector();
+                    vectorSource.addFeatures(features);
+                    vector.setSource(vectorSource);
+                    vector.setStyle(styleFunc);
+                });
+                _index++;
+			},1000);
+
+            function styleFunc(feature, resolution) {
+                var lvalue = feature.get("lvalue"), color = "0,0,0,0";
+                if(lvalue<17.2){
+                    color = "rgba(0,0,0,0)";
+				}
+                else if(lvalue>=17.2&&lvalue<20.7){
+                    color = "#bee8ff";
+                }
+                else if(lvalue>=20.7&&lvalue<24.4){
+                    color = "#bed2ff";
+                }
+                else if(lvalue>=24.4&&lvalue<28.4){
+                    color = "#73b2ff";
+                }
+                else if(lvalue>=28.4&&lvalue<32.6){
+                    color = "#0070ff";
+                }
+                else{
+                    color = "#fae650";
+                }
+                return new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                        color: "rgba(0,0,0,0)",
+//						        lineDash: [10],
+                        width: 1
+                    }),
+                    fill: new ol.style.Fill({
+                        color: color,
+                        opacity:0.6
+                    })
+                });
+            }
+		}
+	</script>
+</head>
+<body onLoad="init()">
+<div id="map">
+	<div id="infobox">
+	</div>
+</div>
+</body>
+</html>

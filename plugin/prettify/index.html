@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>代码高亮展示</title>
+    <link rel="stylesheet" href="css/prettify.css" type="text/css">
+    <script src="../jquery/jquery-3.1.1.min.js"></script>
+    <script src="js/prettify.js"></script>
+    <script>
+        $(function(){
+            var href = "index.html";
+            loadResource(href);
+        });
+        function loadResource(href){
+            href +="?="+new Date().getTime();
+            $.get(href,function(html){
+                html = convert(html);
+                $(".prettyprint").empty();
+                $(".prettyprint").html(html);
+//                prettyPrint();
+            });
+        }
+        function convert(html){
+            html = html.replace(/</g,"&lt;");
+            html = html.replace(/>/g,"&gt;");
+            html = html.replace(/\"/g,"&quot;");
+            return html;
+        }
+    </script>
+</head>
+<body>
+<div>
+	<pre class="prettyprint linenums" style="height: 200px;overflow: auto;"></pre>
+</div>
+</body>
+</html>

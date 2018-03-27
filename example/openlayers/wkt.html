@@ -1,0 +1,118 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Ol3 draw</title>
+	<link rel="stylesheet" type="text/css" href="../../../plugin/ol3/css/ol.css"/>
+	<style type="text/css">
+		body, #map {
+			border: 0px;
+			margin: 0px;
+			padding: 0px;
+			width: 100%;
+			height: 100%;
+			font-size: 13px;
+		}
+	</style>
+	<script type="text/javascript" src="../../../plugin/ol3/build/ol.js"></script>
+	<script type="text/javascript" src="../../../plugin/jquery/jquery-1.8.3.js"></script>
+	<script type="text/javascript">
+		var point = "POINT(116.240041 39.8592)";
+		var line = "MULTILINESTRING((116.240466 39.859252,116.240041 39.8592,116.236872 39.85798))";
+		var polygon = "MULTILINESTRING((116.63099 39.841445,116.631308 39.84161,116.634461 39.841626,116.638784 39.841659,116.643049 39.841691,116.64743 39.841725,116.65216 39.841762,116.656659 39.841795,116.66145 39.841831,116.66612 39.841874,116.669085 39.841379,116.672433 39.84082,116.676242 39.842375,116.680532 39.844125,116.682141 39.845143,116.685756 39.845888,116.689074 39.847873,116.690694 39.850706,116.692338 39.853612,116.694027 39.856583,116.695637 39.859419,116.697319 39.862391,116.698625 39.864708,116.70109 39.865504,116.702706 39.86604,116.706959 39.864924,116.707235 39.864806,116.707575 39.86467,116.711964 39.863589,116.717231 39.862251,116.72014 39.861496,116.720239 39.860243,116.720319 39.860004,116.720466 39.859677))";
+		var wkts = [point, line];
+		function init(){
+			var format = 'image/png';
+			var bounds = [73.4510046356223, 18.1632471876417,
+				134.976797646506, 53.5319431522236];
+			var untiled = new ol.layer.Image({
+				source: new ol.source.ImageWMS({
+					ratio: 1,
+					url: 'http://10.16.48.185:8086/geoserver/lzugis/wms',
+					params: {'FORMAT': 'image/png',
+						'VERSION': '1.1.1',
+						LAYERS: 'lzugis:province',
+						STYLES: ''
+					},
+					serverType: 'geoserver'
+				})
+			});
+            var untiled1 = new ol.layer.Image({
+                source: new ol.source.ImageWMS({
+                    ratio: 1,
+                    url: 'http://10.16.57.77:8086/geoserver/bj_grid/wms?CQL_FILTER=name%3D%27%E6%B9%96%E5%BC%A0%E4%B8%80%27',
+                    params: {'FORMAT': 'image/png',
+                        'VERSION': '1.1.1',
+                        LAYERS: 'lzugis:province',
+                        STYLES: ''
+                    },
+                    serverType: 'geoserver'
+                })
+            });
+			var projection = new ol.proj.Projection({
+				code: 'EPSG:4326',
+				units: 'degrees'
+			});
+			var features = new Array();
+            var fillStyle = new ol.style.Style({
+                fill: new ol.style.Fill({
+                    color: 'rgba(255, 0, 0, 0.2)'
+                })
+            });
+            var strokeStyle = new ol.style.Style({
+                stroke: new ol.style.Stroke({
+                    color: '#ffcc33',
+                    width: 3,
+                    lineJoin: 'round',
+                    lineDash:[3,5]
+                })
+            });
+            var pointStyle = new ol.style.Style({
+                image:new ol.style.Icon({
+                    anchor: [0.5, 0.5],
+                    size: [21, 25],
+                    offset: [0, 0],
+                    opacity: 1,
+                    scale: 0.8,
+                    src: 'data/icon.png'
+                })
+            });
+			for(var i=0;i<wkts.length;i++){
+				var wktformat = new ol.format.WKT();
+				var feature = wktformat.readFeature(wkts[i]);
+				features.push(feature);
+				if(i===0){
+				    feature.setStyle(pointStyle);
+				}
+				else {
+				    feature.setStyle(strokeStyle);
+				}
+			}
+
+			var vector = new ol.layer.Vector({
+				source: new ol.source.Vector({
+					features: features
+				})
+			});
+			var map = new ol.Map({
+				controls: ol.control.defaults({
+					attribution: false
+				}),
+				target: 'map',
+				layers: [untiled,untiled1, vector],
+				view: new ol.View({
+					projection: new ol.proj.Projection({
+						code: 'EPSG:4326',
+						units: 'degrees'
+					}),
+					center: [103.847, 36.0473],
+        			zoom: 4
+				})
+			});
+		}
+	</script>
+</head>
+<body onLoad="init()">
+<div id="map">
+</div>
+</body>
+</html>

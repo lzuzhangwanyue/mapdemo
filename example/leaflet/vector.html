@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>leaflet</title>
+    <link rel="stylesheet" href="../../plugin/leaflet/leaflet.css" type="text/css">
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+        }
+        html, body, #map {
+            height: 100%;
+        }
+        .leaflet-control-attribution{
+            display: none;
+        }
+    </style>
+    <script src="../../plugin/jquery/jquery-1.8.3.js"></script>
+    <script src="../../plugin/leaflet/leaflet.js"></script>
+    <script>
+        var map;
+        $(window).load(function() {
+            map = L.map('map').setView([35.851354460363,104.21390114103], 4);//35.851354460363,104.21390114103
+            var wms = L.tileLayer.wms("http://localhost:8086/geoserver/lzugis/wms", {
+                layers: 'province',
+                format: 'image/png',
+                transparent: true,
+                version:'1.1.1'
+            });
+            map.addLayer(wms);
+			var lonlat = {
+				lat: 40.895806530184856, 
+				lng: 111.84285564844028
+			};
+            var point = L.circleMarker(lonlat,{
+            	radius: 8,
+				fillColor: "#ff7800",
+				color: "#000",
+				weight: 1,
+				opacity: 1,
+				fillOpacity: 0.8
+            }).addTo(map);
+            var line  = L.polyline([
+                [40, 100],
+                [45, 110]
+            ],{
+                color: '#ff0000',
+                strokeWidth:1
+            }).addTo(map);
+            var circle = L.circle([32,105], 100000, {
+                color: '#0000ff',
+                fillColor: '#ff0000',
+                fillOpacity: 0.2,
+                strokeWidth:1
+            }).addTo(map);
+            var polygon = L.polygon([
+                [35, 100],
+                [37, 110],
+                [37, 103]
+            ],{
+                color: '#0000ff',
+                fillColor: '#ff0000',
+                fillOpacity: 0.2,
+                strokeWidth:1
+            }).addTo(map);
+
+            point.bindPopup('point');
+            line.bindPopup('line');
+            circle.bindPopup('circle');
+            polygon.bindPopup('polygon');
+        });
+    </script>
+</head>
+<body>
+<div id="map"></div>
+</body>
+</html>

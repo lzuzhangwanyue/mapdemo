@@ -1,0 +1,74 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Ol3 wms</title>
+	<link rel="stylesheet" href="https://openlayers.org/en/v4.5.0/css/ol.css" type="text/css">
+	<style type="text/css">
+		body, #map {
+			border: 0px;
+			margin: 0px;
+			padding: 0px;
+			width: 100%;
+			height: 100%;
+			font-size: 13px;
+		}
+	</style>
+</head>
+<body>
+<div id="map">
+</div>
+<!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+<script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+<script src="https://openlayers.org/en/v4.5.0/build/ol.js"></script>
+<script type="text/javascript">
+//    var tiled = new ol.layer.Tile({
+//        source: new ol.source.TileWMS({
+//            url: 'http://localhost:6080/geoserver/bj_grid/wms',
+//            params: {'FORMAT': 'image/png',
+//                'VERSION': '1.1.1',
+//                tiled: true,
+//                LAYERS: 'bj_grid:bj_county_dark',
+//                STYLES: ''
+//            },
+//            serverType: 'geoserver'
+//        })
+//    });
+    var tiled = new ol.layer.Image({
+        source: new ol.source.ImageWMS({
+            ratio: 1,
+            url: 'http://localhost:6080/geoserver/bj_grid/wms',
+            params: {
+                'FORMAT': 'image/png',
+                'VERSION': '1.1.1',
+                LAYERS: 'bj_county_dark',
+                STYLES: ''
+            },
+            serverType: 'geoserver'
+        })
+    });
+    //			var projection = new ol.proj.Projection({
+    //				code: 'EPSG:4326',
+    //				units: 'degrees'
+    //			});
+    var projection = new ol.proj.Projection({
+        code: 'EPSG:3857',
+        units: 'm'
+    });
+    var map = new ol.Map({
+        controls: ol.control.defaults({
+            attribution: false
+        }),
+        target: 'map',
+        layers: [
+            tiled
+        ],
+        view: new ol.View({
+            projection: projection,
+//                    center: [103.847, 36.0473],
+            center: ol.proj.transform([103.847, 36.0473], "EPSG:4326", "EPSG:3857"),
+            zoom: 4
+        })
+    });
+</script>
+</body>
+</html>

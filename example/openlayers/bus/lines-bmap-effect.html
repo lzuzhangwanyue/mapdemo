@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <title>ol3-line</title>
+  <link type="text/css" rel="stylesheet" href="../../../../plugin/ol4/ol.js">
+  <style>
+    html, body, #map {
+      height: 100%;
+      padding: 0;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+<div id="map"></div>
+<script type="text/javascript" src="../../../../plugin/ol4/ol.js"></script>
+<script type="text/javascript" src="../../../../plugin/jquery/jquery-3.1.1.min.js"></script>
+<script src="../../../../plugin/echart3/echarts-all-3.js"></script>
+<script src="ol3Echarts.js"></script>
+<script>
+  var map;
+  function getTdtLayer(lyr){
+      var url = "http://t0.tianditu.com/DataServer?T="+lyr+"&X={x}&Y={y}&L={z}";
+      var layer = new ol.layer.Tile({
+          source: new ol.source.XYZ({
+              url:url
+          })
+      });
+      return layer;
+  }
+  $(document).ready(function () {
+      var vec_w = getTdtLayer("img_w");
+      map = new ol.Map({
+          controls: ol.control.defaults({
+              attribution: false
+          }),
+          target: 'map',
+          layers: [
+              vec_w
+          ],
+          view: new ol.View({
+              center: ol.proj.transform([116.28245, 39.92121], 'EPSG:4326', 'EPSG:3857'),
+              zoom: 10
+          })
+      });
+      setTimeout(addBusLine, 100);
+  });
+  function addBusLine(){
+      $.get('lines-bus.json', function(data) {
+          var hStep = 100 / (data.length - 1);
+          var busLines = [].concat.apply([], data.map(function (busLine, idx) {
+              var prevPt;
+              var points = [];
+              for (var i = 0; i < busLine.length; i += 2) {
+                  var pt = [busLine[i], busLine[i + 1]];
+                  if (i > 0) {
+                      pt = [
+                          prevPt[0] + pt[0],
+                          prevPt[1] + pt[1]
+                      ];
+                  }
+                  prevPt = pt;
+                  points.push([pt[0] / 1e4, pt[1] / 1e4]);
+              }
+              return {
+                  coords: points,
+                  lineStyle: {
+                      normal: {
+                          color: echarts.color.modifyHSL('#5A94DF', Math.round(hStep * idx))
+                      }
+                  }
+              };
+          }));
+          var option = {
+              openlayers: {},
+              series: [
+                  {
+                      type: 'lines',
+                      coordinateSystem: 'openlayers',
+                      polyline: true,
+                      data: busLines,
+                      silent: true,
+                      lineStyle: {
+                          normal: {
+                              // color: '#c23531',
+                              // color: 'rgb(200, 35, 45)',
+                              opacity: 0.2,
+                              width: 1
+                          }
+                      },
+                      progressiveThreshold: 500,
+                      progressive: 200
+                  },
+                  {
+                      type: 'lines',
+                      coordinateSystem: 'openlayers',
+                      polyline: true,
+                      data: busLines,
+                      lineStyle: {
+                          normal: {
+                              width: 0
+                          }
+                      },
+                      effect: {
+                          constantSpeed: 20,
+                          show: true,
+                          trailLength: 0.1,
+                          symbolSize: 1.5
+                      },
+                      zlevel: 1
+                  }
+              ]
+          };
+          var echartslayer = new ol3Echarts(map, {
+              target: '.lines-bus',
+              source: '',
+              destination: ''
+          });
+          echartslayer.chart.setOption(option);
+      })
+  }
+</script>
+</body>
+</html>

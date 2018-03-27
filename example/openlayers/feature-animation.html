@@ -1,0 +1,132 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Ol3 wms</title>
+	<link rel="stylesheet" type="text/css" href="../../../plugin/ol3/css/ol.css"/>
+	<style type="text/css">
+		body, #map {
+			border: 0px;
+			margin: 0px;
+			padding: 0px;
+			width: 100%;
+			height: 100%;
+			font-size: 13px;
+		}
+	</style>
+	<script type="text/javascript" src="../../../plugin/ol3/build/ol-debug.js"></script>
+	<script type="text/javascript" src="../../../plugin/jquery/jquery-1.8.3.js"></script>
+	<script type="text/javascript">
+		function init(){
+			var format = 'image/png';
+			var tiled = new ol.layer.Tile({
+				visible: true,
+				source: new ol.source.TileWMS({
+					url: 'http://192.168.10.185:8086/geoserver/lzugis/wms',
+					params: {'FORMAT': format,
+						'VERSION': '1.1.1',
+						tiled: true,
+						LAYERS: 'lzugis:province',
+						STYLES: ''
+					},
+					serverType: 'geoserver'
+				})
+			});
+			var projection = new ol.proj.Projection({
+				code: 'EPSG:4326',
+				units: 'degrees'
+			});
+			var map = new ol.Map({
+				controls: ol.control.defaults({
+					attribution: false
+				}),
+				target: 'map',
+				layers: [
+					tiled
+				],
+				view: new ol.View({
+					projection: projection,
+					center: [103.847, 36.0473],
+        			zoom: 4
+				})
+			});
+			var source = new ol.source.Vector({
+		        wrapX: false
+		    });
+			var vector = new ol.layer.Vector({
+				source: source,
+				style: new ol.style.Style({
+				    image: new ol.style.Circle({
+						radius: 1,
+						stroke: new ol.style.Stroke({color: 'blue', width: 5})
+					})
+				})
+			});
+			source.on('addfeature', function(e) {
+				flash(e.feature);
+			});
+			map.addLayer(vector);
+			
+		    var duration = 3000;
+		    function flash(feature) {
+		        var start = new Date().getTime();
+		        var listenerKey;
+		        function animate(event) {
+		          var vectorContext = event.vectorContext;
+		          var frameState = event.frameState;
+		          var flashGeom = feature.getGeometry().clone();
+		          var elapsed = frameState.time - start;
+		          var elapsedRatio = elapsed / duration;
+		          // radius will be 5 at start and 30 at end.
+		          var radius = ol.easing.easeOut(elapsedRatio) * 25 + 5;
+		          var opacity = ol.easing.easeOut(1 - elapsedRatio);
+		
+		          var style = new ol.style.Style({
+		            image: new ol.style.Circle({
+		              radius: radius,
+		              snapToPixel: false,
+		              stroke: new ol.style.Stroke({
+		                color: 'rgba(255, 0, 0, ' + opacity + ')',
+		                width: 0.25 + opacity
+		              })
+		            })
+		          });
+		
+		          vectorContext.setStyle(style);
+		          vectorContext.drawGeometry(flashGeom);
+		          if (elapsed > duration) {
+		            ol.Observable.unByKey(listenerKey);
+		            return;
+		          }
+		          // tell OL3 to continue postcompose animation
+		          map.render();
+		        }
+		        listenerKey = map.on('postcompose', animate);
+		    }
+		    
+		    
+		    var features = [], flag = 0;
+		    $.get("data/capital.geojson",null,function(result){
+//				result = eval("("+result+")");
+				features= result.features;
+			});
+		    function addFeature(){
+		    	if(features.length>0){
+		    		var feature = features[flag];
+				    var geom = new ol.geom.Point(feature.geometry.coordinates);
+				    var feature = new ol.Feature(geom);
+				    source.addFeature(feature);
+				    flag++;
+		    	}
+		    	if(flag===features.length){
+		    		window.clearInterval(interval);
+		    	}
+		    };
+		    var interval = window.setInterval(addFeature, 1000);
+		}
+	</script>
+</head>
+<body onLoad="init()">
+<div id="map">
+</div>
+</body>
+</html>

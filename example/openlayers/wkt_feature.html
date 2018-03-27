@@ -1,0 +1,136 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Ol3 draw</title>
+	<link rel="stylesheet" type="text/css" href="../../../plugin/ol3/css/ol.css"/>
+	<style type="text/css">
+		body, #map {
+			border: 0px;
+			margin: 0px;
+			padding: 0px;
+			width: 100%;
+			height: 100%;
+			font-size: 13px;
+		}
+	</style>
+	<script type="text/javascript" src="../../../plugin/ol3/build/ol.js"></script>
+	<script type="text/javascript" src="../../../plugin/jquery/jquery-1.8.3.js"></script>
+	<script type="text/javascript">
+        /**
+		 * 定义WKT对象
+         * @param wkt
+         * @param attr
+         * @constructor
+         */
+        var WktFeature = function(wkt, attr, style){
+            this.wkt = wkt;
+            this.wktformat = new ol.format.WKT();
+            this.feature = this.wktformat.readFeature(this.wkt);
+            this.setStyle(style);
+            this.attr = attr;
+            for(var _f in attr){
+                this.feature.set(_f, attr[_f]);
+            }
+            return this.getFeature();
+        };
+        //定义方法
+        WktFeature.prototype = {
+            getWkt: function(){
+                return this.wkt;
+            },
+            setWkt: function (wkt){
+                this.wkt = wkt;
+                this.feature = this.wktformat.readFeature(this.wkt);
+            },
+            getFeature: function(){
+                return this.feature;
+            },
+            getAttribute: function(){
+                return this.attr;
+            },
+            setAttribute: function(attr){
+                for(var _f in attr){
+                    this.feature.set(_f, attr[_f]);
+                }
+            },
+			setStyle: function(style){
+                this.feature.setStyle(style);
+			}
+        };
+
+		var point = "POINT(116.240041 39.8592)";
+		var line = "LINESTRING(73.4510046356223 18.1632471876417,116.240041 39.8592,116.236872 39.85798)";
+		var wkts = [point, line];
+		function init(){
+			var untiled = new ol.layer.Image({
+				source: new ol.source.ImageWMS({
+					ratio: 1,
+					url: 'http://localhost:6080/geoserver/bj_grid/wms',
+					params: {'FORMAT': 'image/png',
+						'VERSION': '1.1.1',
+						LAYERS: 'china_railway_new',
+						STYLES: ''
+					},
+					serverType: 'geoserver'
+				})
+			});
+			var features = new Array();
+			var style = new ol.style.Style({
+                fill: new ol.style.Fill({
+                    color: 'rgba(255, 0, 0, 0.2)'
+                }),
+                stroke: new ol.style.Stroke({
+                    color: '#ffcc33',
+                    width: 3,
+                    lineJoin: 'round',
+                    lineDash: [3, 5]
+                }),
+                image: new ol.style.Icon({
+                    anchor: [0.5, 0.5],
+                    size: [21, 25],
+                    offset: [0, 0],
+                    opacity: 1,
+                    scale: 0.8,
+                    src: 'data/icon.png'
+                })
+            });
+            var _style = new ol.style.Style({
+                stroke: new ol.style.Stroke({
+                    color: '#ff2b2f',
+                    width: 3,
+                    lineJoin: 'round'
+                })
+            });
+			for(var i=0;i<wkts.length;i++){
+				var feature = new WktFeature(wkts[i], {"id":i}, style);
+				if(i>0)feature.setStyle(_style);
+				features.push(feature);
+			}
+			var vector = new ol.layer.Vector({
+                source: new ol.source.Vector({
+                    features: features
+                })
+            });
+			var map = new ol.Map({
+				controls: ol.control.defaults({
+					attribution: false
+				}),
+				target: 'map',
+				layers: [untiled, vector],
+				view: new ol.View({
+					projection: new ol.proj.Projection({
+						code: 'EPSG:4326',
+						units: 'degrees'
+					}),
+					center: [103.847, 36.0473],
+        			zoom: 4
+				})
+			});
+		}
+	</script>
+</head>
+<body onLoad="init()">
+<div id="map">
+</div>
+</body>
+</html>

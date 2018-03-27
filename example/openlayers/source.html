@@ -1,0 +1,75 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Ol3 wms</title>
+	<link rel="stylesheet" type="text/css" href="../../../plugin/ol3/css/ol.css"/>
+	<style type="text/css">
+		body,#map{
+			border: 0px;
+			margin: 0px;
+			padding: 0px;
+			width: 100%;
+			height: 100%;
+			text-align: center;
+			font-size: 13px;
+		}
+		.map {
+			border: 0px;
+			margin: 0px;
+			padding: 0px;
+			width: 49.9%;
+			height: 100%;
+			border-right: 1px solid #000000;
+			float: left;
+		}
+		.tool{
+			position: absolute;
+			top: 10px;
+			right: 40px;
+			z-index: 99;
+		}
+	</style>
+	<script type="text/javascript" src="../../../plugin/ol3/build/ol.js"></script>
+	<script type="text/javascript" src="../../../plugin/jquery/jquery-1.8.3.js"></script>
+	<script type="text/javascript">
+		function init(){
+			var format = 'image/png';
+			var untiled = new ol.layer.Image({
+				source: new ol.source.ImageWMS({
+					ratio: 1,
+					url: 'http://192.168.10.185:8086/geoserver/lzugis/wms',
+					params: {
+						'FORMAT': format,
+						'VERSION': '1.1.1',
+						LAYERS: 'lzugis:province',
+						STYLES: ''
+					},
+					serverType: 'geoserver'
+				})
+			});
+			var projection = new ol.proj.Projection({
+				code: 'EPSG:4326',
+				units: 'degrees'
+			});
+			// create our interaction
+			var layers = new ol.Collection([untiled]);
+			var map = new ol.Map({
+				target: 'map1',
+				layers: layers,
+				view: new ol.View({
+					projection: projection,
+					center: [103.847, 36.0473],
+        			zoom: 4
+				})
+			});
+		}
+	</script>
+</head>
+<body onLoad="init()">
+	<div class="tool">
+		<button id="target">change target</button>
+	</div>
+	<div id="map1" class="map"></div>
+	<div id="map2" class="map"></div>
+</body>
+</html>

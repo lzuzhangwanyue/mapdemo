@@ -1,0 +1,150 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+    <meta http-equiv="imagetoolbar" content="no">
+    <title>mapbox-vector</title>
+    <link rel="stylesheet" type="text/css" href="../../../plugin/ol4/ol.css"/>
+    <style type="text/css">
+        body { font-family: sans-serif; font-weight: bold; font-size: .8em; }
+        body { border: 0px; margin: 0px; padding: 0px; }
+        #map { width: 100%; height: 100%; border: 0px; padding: 0px; }
+    </style>
+    <script type="text/javascript" src="../../../plugin/ol4/ol.js"></script>
+    <script type="text/javascript" src="../../../plugin/ol4/ol-extent.js"></script>
+    <script type="text/javascript" src="../../../plugin/jquery/jquery-3.1.1.min.js"></script>
+
+    <script type="text" id="cartoCssStr">
+        /*此处定义不同的颜色变量，在后面可以重复用这些颜色值*/
+        @waterColor:rgb(2,16,25);
+        @roadColora:rgb(18,117,142);
+        @roadColorb:rgb(0,0,0);
+        @railwayColora:rgb(0,0,0);
+        @railwayColorb:rgb(0,0,0);
+        @vegetationColor:rgb(2,16,25);
+        @continentColor:rgb(8,48,75);
+        @provinceLineColor:rgb(30,30,30);
+
+
+        /*中国除外的其他国家的图层*/
+        #World_Continent_pl___China{
+            polygon-fill:@continentColor;
+            line-width:1;
+            line-color:@continentColor;
+        }
+        #China_Province_pl___China{
+            polygon-fill:@continentColor;
+            line-color:rgba(0,0,0,0);
+        }
+
+        #Arterial_Road_ln___China::one{
+            line-color:@roadColora;
+            line-width:2;
+        }
+        #Arterial_Road_ln___China::two{
+            line-color:@roadColorb;
+            line-width:1;
+        }
+
+        #Arterial_Road_ln___China___1::one{
+            line-color:@roadColora;
+            line-width:2;
+        }
+        #Arterial_Road_ln___China___1::two{
+            line-color:@roadColorb;
+            line-width:1;
+        }
+
+        #Arterial_Road_ln___China___1___1::one{
+            line-color:@roadColora;
+            line-width:2;
+        }
+        #Arterial_Road_ln___China___1___1::two{
+            line-color:@roadColorb;
+            line-width:1;
+        }
+
+        #Main_Road_L___China::one{
+            line-color:@roadColora;
+            line-width:2;
+        }
+        #Main_Road_L___China::two{
+            line-color:@roadColorb;
+            line-width:1;
+        }
+
+        #Main_Road_L___China___1::one{
+            line-color:@roadColora;
+            line-width:2;
+        }
+        #Main_Road_L___China___1::two{
+            line-color:@roadColorb;
+            line-width:1;
+        }
+
+        #Main_Road_L___China___1___1::a{
+            line-color:@roadColora;
+            line-width:2;
+        }
+        #Main_Road_L___China___1___1::b{
+            line-color:@roadColorb;
+            line-width:1;
+        }
+
+        #Hydside_Area_pl___Hydside{
+            polygon-fill:@waterColor;
+            line-color:@waterColor;
+        }
+
+        #China_Provinces_L___China400{
+            line-dasharray:10,10;
+            line-color:@provinceLineColor;
+            line-width:1;
+        }
+    </script>
+
+    <script type="text/javascript">
+        var map;
+        function init(){
+            var url = (window.isLocal ? window.server : "http://support.supermap.com.cn:8090")+"/iserver/services/map-china400/rest/maps/China";
+            new ol.supermap.MapService(url).getMapInfo(function (serviceResult) {
+                var map = new ol.Map({
+                    target: 'map',
+                    controls: ol.control.defaults({
+                        attribution: false
+                    }),
+                    view: new ol.View({
+                        center: [12957388, 4853991],
+                        zoom: 11
+                    })
+                });
+                var stylesOptions = {
+                    url: url,
+                    view: map.getView(),
+                    donotNeedServerCartoCss: true,
+                    cartoCss: document.getElementById("cartoCssStr").text
+                };
+                var vectorTileStyles = new ol.supermap.VectorTileStyles(stylesOptions);
+                var vectorTileOptions = ol.source.VectorTileSuperMapRest.optionsFromMapJSON(url, serviceResult.result);
+                var vectorLayer = new ol.layer.VectorTile({
+                    source: new ol.source.VectorTileSuperMapRest(vectorTileOptions),
+                    style: vectorTileStyles.getFeatureStyle
+                });
+                map.addLayer(vectorLayer);
+                map.on('click', function (e) {
+                    map.forEachFeatureAtPixel(e.pixel, function (feature) {
+                        vectorTileStyles.dispatchEvent({type: 'featureSelected',
+                            selectedId: feature.getProperties().id,
+                            layerName: feature.getProperties().layerName
+                        });
+                        return true;
+                    }, {hitTolerance: 5});
+                    vectorLayer.changed();
+                })
+
+            });
+        }
+    </script>
+</head>
+<body onload="init()">
+<div id="map">
+</div>
+</body>
+</html>

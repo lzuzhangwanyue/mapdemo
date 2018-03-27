@@ -1,0 +1,99 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Ol3 draw</title>
+	<link rel="stylesheet" type="text/css" href="../../../plugin/ol3/css/ol.css"/>
+	<style type="text/css">
+		body, #map {
+			border: 0px;
+			margin: 0px;
+			padding: 0px;
+			width: 100%;
+			height: 100%;
+			font-size: 13px;
+		}
+	</style>
+	<script type="text/javascript" src="../../../plugin/ol3/build/ol.js"></script>
+	<script type="text/javascript" src="../../../plugin/jquery/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="extends/canvas2img.js"></script>
+	<script type="text/javascript">
+		function init(){
+			var untiled = new ol.layer.Image({
+				source: new ol.source.ImageWMS({
+					ratio: 1,
+					url: 'http://localhost:6080/geoserver/bj_grid/wms',
+					params: {'FORMAT': 'image/png',
+						'VERSION': '1.1.1',
+						LAYERS: 'bou2_4p',
+						STYLES: ''
+					},
+					serverType: 'geoserver'
+				})
+			});
+			var features = new Array();
+            /**
+			 * 最后一个数组是噪声数据
+             * @type {[*]}
+             */
+			var wkts = [
+			    ['POINT(117.203 39.131)', 'POINT(114.49 38.045)', 'POINT(112.569 37.871)', 'POINT(111.663 40.821)', 'POINT(117.006 36.667)', 'POINT(116.381 39.924)', 'POINT(113.65 34.757)', 'POINT(118.773 32.048)', 'POINT(117.276 31.863)', 'POINT(121.469 31.238)', 'POINT(120.159 30.266)', 'POINT(115.9 28.676)', 'POINT(114.292 30.568)', 'POINT(119.298 26.079)', 'POINT(112.981 28.201)', 'POINT(121.514 25.049)', 'POINT(108.949 34.262)', 'POINT(106.272 38.468)', 'POINT(103.75 36.068)', 'POINT(101.787 36.609)'],
+				['POINT(123.412 41.797)', 'POINT(126.643 45.741)', 'POINT(125.315 43.893)'],
+				['POINT(108.312 22.807)', 'POINT(110.347 20.032)', 'POINT(113.55 22.201)', 'POINT(114.154 22.281)', 'POINT(113.261 23.119)', 'POINT(106.711 26.577)', 'POINT(104.082 30.661)', 'POINT(106.51 29.558)', 'POINT(102.705 25.044)'],
+				['POINT(91.132 29.658)', 'POINT(87.606 43.791)']
+			];
+            var wktformat = new ol.format.WKT();
+			for(var i=0;i<wkts.length;i++){
+			    var _wkts = wkts[i];
+			    var _color = "#"+("00000"+((Math.random()*16777215+0.5)>>0).toString(16)).slice(-6);
+                if(i===wkts.length-1)_color = "#000";
+			    for(var j=0;j<_wkts.length;j++){
+                    var feature = wktformat.readFeature(_wkts[j]);
+                    feature.set("color",_color);
+                    features.push(feature);
+                }
+			}
+			var vector = new ol.layer.Vector({
+				source: new ol.source.Vector({
+					features: features
+				}),
+				style: function(feature){
+                    return new ol.style.Style({
+                        image: new ol.style.Circle({
+                            radius: 7,
+                            fill: new ol.style.Fill({
+                                color: feature.get("color")
+                            })
+                        })
+                    })
+				}
+			});
+			map = new ol.Map({
+				controls: ol.control.defaults({
+					attribution: false
+				}),
+				target: 'map',
+				layers: [untiled, vector],
+				view: new ol.View({
+					projection: new ol.proj.Projection({
+						code: 'EPSG:4326',
+						units: 'degrees'
+					}),
+					center: [103.847, 36.0473],
+        			zoom: 4
+				})
+			});
+
+			$("#exportmap").on("click", function () {
+				var _c = $(map.getViewport()).find("canvas")[0];
+				var _s = map.getSize();
+                Canvas2Image.saveAsImage(_c, _s[0], _s[1], "png");
+            })
+		}
+	</script>
+</head>
+<body onLoad="init()">
+<button id="exportmap" style="position:absolute;top: 10px;right: 10px;z-index: 9;">exportmap</button>
+<div id="map">
+</div>
+</body>
+</html>

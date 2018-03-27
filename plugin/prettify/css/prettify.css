@@ -1,0 +1,100 @@
+.pln {
+	color: #000;
+	color: #fff;
+}
+
+@media screen {
+	.str {
+		color: #080
+	}
+	.kwd {
+		color: #008;
+		color: #FBA125;
+	}
+	.com {
+		color: #800;
+		color: #B3B3B3;
+	}
+	.typ {
+		color: #606;
+		color: #DAFA44;
+	}
+	.lit {
+		color: #066
+	}
+	.pun,.opn,.clo {
+		color: #660;
+		color: #5390CE;
+	}
+	.tag {
+		color: #008;
+		color: #FF4A18;
+	}
+	.atn {
+		color: #606;
+		color: #FF4A18;
+	}
+	.atv {
+		color: #080;
+	}
+	.dec,.var {
+		color: #606;
+		color: #FF4A18;
+	}
+	.fun {
+		color: red
+	}
+}
+
+@media print , projection {
+	.str {
+		color: #060
+	}
+	.kwd {
+		color: #006;
+		font-weight: bold
+	}
+	.com {
+		color: #600;
+		font-style: italic
+	}
+	.typ {
+		color: #404;
+		font-weight: bold
+	}
+	.lit {
+		color: #044
+	}
+	.pun,.opn,.clo {
+		color: #440
+	}
+	.tag {
+		color: #006;
+		font-weight: bold
+	}
+	.atn {
+		color: #404
+	}
+	.atv {
+		color: #060
+	}
+}
+
+pre.prettyprint {
+	background-color: #ddd;
+	border: 1px solid #888;
+	font-size: 14px;
+	font-family:"Consolas";
+	line-height: 1.40;
+	margin: 0px;
+}
+
+ol.linenums {
+	margin-top: 0;
+	margin-bottom: 0
+}
+
+li{
+	background: #0C1021;
+	border-left: 2px solid #008800;
+}

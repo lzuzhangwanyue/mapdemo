@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
+    <style type="text/css">
+    body {
+        padding: 0;
+        margin: 0;
+    }
+    
+    html,
+    body,
+    #map {
+        height: 100%;
+    }
+    </style>
+
+</head>
+
+<body>
+    <div id='map'></div>
+    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
+    <script type="text/javascript" src='../src/leaflet.ChineseTmsProviders.js'></script>
+    <script type="text/javascript" src="../lib/transform.js"></script>
+    <script type="text/javascript">
+        var normalm = L.tileLayer.chinaProvider('GaoDe.Normal.Map', {
+            maxZoom: 18,
+            minZoom: 5
+        });
+        var imgm = L.tileLayer.chinaProvider('GaoDe.Satellite.Map', {
+            maxZoom: 18,
+            minZoom: 5
+        });
+        var imga = L.tileLayer.chinaProvider('GaoDe.Satellite.Annotion', {
+            maxZoom: 18,
+            minZoom: 5
+        });
+
+        var normal = L.layerGroup([normalm]),
+                image = L.layerGroup([imgm, imga]);
+
+        var baseLayers = {
+            "地图": normal,
+            "影像": image
+        }
+
+        var map = L.map("map", {
+            center: [32.90, 118.96],
+            zoom: 7,
+            layers: [normal],
+            zoomControl: false
+        });
+
+        L.control.layers(baseLayers, null).addTo(map);
+        L.control.zoom({
+            zoomInTitle: '放大',
+            zoomOutTitle: '缩小'
+        }).addTo(map);
+        L.marker([34.78,119.44]).addTo(map)
+                .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
+                .openPopup();
+        var windData = [
+            [34.78,119.44,120,5],
+            [35.78,119.44,180,6],
+            [34.68,120.44,20,7],
+            [34.58,121.44,60,8],
+            [34.48,119.44,50,9],
+            [34.38,119.44,40,10],
+            [34.28,119.44,90,8]
+        ]
+
+
+        function addWindMap(){
+            canvas = document.createElement('canvas');
+            canvas.id = "windCanvas";
+            canvas.width = map.getSize().x;
+            canvas.height = map.getSize().y;
+            canvas.style.position = 'absolute';
+            canvas.style.top = 0;
+            canvas.style.left = 0;
+
+            map.getContainer().appendChild(canvas);
+            windy = new Windy({
+                map: map,
+                canvas: canvas,
+                data: windData
+            });
+
+            function choice(data){
+                for(var i=0;i<data.length;i++){
+                    if(data[i][3]>300){
+                        return options2;
+                    }else{
+                        return options;
+                    }
+                }
+            }
+
+            var options = {
+                size: .8,//控制线条粗细
+                color: 'rgba(71,160,233,0.8)',//控制线条颜色
+            };
+            windy.change(options);
+            windDraw();
+
+            map.on('movestart',function(){
+                windy.stop();
+                $(canvas).hide();
+            });
+            map.on("moveend",function(){
+                windDraw();
+            });
+        }
+        function windDraw(){
+            $(canvas).show();
+            //leaflet中getBounds方法获得的是左上角和右下角的坐标
+            //          var bounds = map.getBounds();
+
+            //          var bounds._southWest.lng = 112;
+            //          var bounds._southWest.lat = 21;
+            //          var bounds._northEast.lng = 115;
+            //          var bounds._northEast.lat = 23;
+            //设置bounds的经纬度范围可使其在指定范围内显示风场
+            var bounds = [109,20,118,25];
+            //          var _min = [bounds._southWest.lng, bounds._southWest.lat];
+            //          var _max = [bounds._northEast.lng, bounds._northEast.lat];
+            var _min = [bounds[0],bounds[1]];
+            var _max = [bounds[2],bounds[3]];
+            _min.reverse();
+            _max.reverse();
+            var py = [0,0];
+            canvas.style.left = py[0] + 'px';
+            canvas.style.top = py[1] + 'px';
+            var points = invertLatLon(py); //所有站点经纬度转为canvas坐标
+            var min = map.latLngToContainerPoint(_min);
+            var max = map.latLngToContainerPoint(_max);
+
+            var extent = [
+                [min.x - py[0], max.y - py[1]],
+                [max.x - py[0], min.y - py[1]]
+            ];
+
+            windy.start(extent, points);
+        }
+
+        function invertLatLon (py) {
+            var points = [];
+            windData.forEach(function (station) {
+                var px = map.latLngToContainerPoint([station[0], station[1]]);
+
+                var x = px.x-py[0];
+                var y = px.y-py[1];
+                var angle = station[2];
+                var speed = station[3];
+
+                points.push({
+                    x,y,angle,speed
+                });
+
+            });
+            return points;
+
+        }
+        function drawcircle(latlng){
+            var circle = L.Circle(latlng, {
+                color: 'red',
+                fillColor: '#f03',
+                fillOpacity: 0.5,
+                radius: 500
+            }).addTo(map);
+
+        }
+        for(var i=0;i<windData.length;i++){
+            drawcircle([windData[i][0],windData[i][1]]);
+        }
+    </script>
+</body>
+
+
+</html>

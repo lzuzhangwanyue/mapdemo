@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Earthquakes Heatmap</title>
+    <link rel="stylesheet" type="text/css" href="../../../plugin/ol3/css/ol.css"/>
+    <style type="text/css">
+      body, #map {
+        border: 0px;
+        margin: 0px;
+        padding: 0px;
+        width: 100%;
+        height: 100%;
+        font-size: 13px;
+        overflow: hidden;
+      }
+      .radius{
+        position: absolute;
+        top: 15px;
+        right:15px;
+        z-index: 9;
+        width: auto;
+      }
+      .radius input[type=range]{
+        width: 300px;
+      }
+    </style>
+    <script type="text/javascript" src="../../../plugin/ol3/build/ol-debug.js"></script>
+    <script type="text/javascript" src="../../../plugin/jquery/jquery-1.8.3.js"></script>
+  </head>
+  <body>
+  <div class="radius">
+    radius:<span id="vradius">20</span><input type="range" min="0" max="100" step="1" id="radius" value="8"><br/>
+    blur:<span id="vblur">0</span><input type="range" min="0" max="100" step="1" id="blur" value="8">
+  </div>
+    <div id="map"></div>
+    <script>
+      $.get("data/capital.geojson",null,function(result){
+          var features = (new ol.format.GeoJSON()).readFeatures(result);
+          for(var i=0;i<features.length;i++){
+              var _feature = features[i];
+              var _geom = features[i].getGeometry();
+              _feature.setGeometry(_geom);
+          }
+          var vectorSource = new ol.source.Vector({
+              features: features
+//              url:'data/heatmap.geojson',
+//              format: new ol.format.GeoJSON()
+          });
+
+          var heatmap = new ol.layer.Heatmap({
+              source: vectorSource,
+              blur: parseInt($("#blur").val()),
+              radius: parseInt($("#radius").val()),
+              opacity:1,
+              shadow:500,
+//              gradient:['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026'],
+          });
+//          $("#radius").on("input", function(){
+          $("#radius").on("change", function(){
+            heatmap.setRadius(parseInt($(this).val()));
+            $("#vradius").html($(this).val());
+          });
+          $("#blur").on("change", function(){
+              heatmap.setBlur(parseInt($(this).val()));
+              $("#vblur").html($(this).val());
+          });
+          heatmap.getSource().on('addfeature', function(event) {
+              var name = event.feature.get('name');
+              var magnitude = parseFloat(name.substr(2));
+              event.feature.set('weight', magnitude - 5);
+          });
+          var format = 'image/png';
+          var bounds = [73.4510046356223, 18.1632471876417,
+              134.976797646506, 53.5319431522236];
+          var untiled = new ol.layer.Image({
+              source: new ol.source.ImageWMS({
+                  ratio: 1,
+                  url: 'http://localhost:6080/geoserver/bj_grid/wms',
+                  params: {'FORMAT': format,
+                      'VERSION': '1.1.1',
+                      LAYERS: 'bj_grid:china_railway_new',
+                      STYLES: ''
+                  },
+                  serverType: 'geoserver'//在新版本中是必须的参数
+              })
+          });
+          var projection = new ol.proj.Projection({
+              code: 'EPSG:4326',
+              units: 'degrees'
+          });
+          var map = new ol.Map({
+              controls: ol.control.defaults({
+                  attribution: false
+              }),
+              target: 'map',
+              layers: [
+                  untiled,
+                  heatmap
+              ],
+              view: new ol.View({
+                  projection: projection
+              })
+          });
+          map.getView().fit(bounds, map.getSize());
+      });
+    </script>
+  </body>
+</html>

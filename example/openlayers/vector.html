@@ -1,0 +1,109 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Ol3 draw</title>
+	<link rel="stylesheet" type="text/css" href="../../../plugin/ol4/ol.css"/>
+	<style type="text/css">
+		body, #map {
+			border: 0px;
+			margin: 0px;
+			padding: 0px;
+			width: 100%;
+			height: 100%;
+			font-size: 13px;
+		}
+	</style>
+	<script type="text/javascript" src="../../../plugin/ol4/ol.js"></script>
+	<script type="text/javascript" src="../../../plugin/jquery/jquery-1.8.3.js"></script>
+	<script type="text/javascript">
+		function init(){
+			var untiled = new ol.layer.Image({
+				source: new ol.source.ImageWMS({
+					ratio: 1,
+					url: 'http://localhost:6080/geoserver/bj_grid/wms',
+					params: {'FORMAT': 'image/png',
+						VERSION: '1.1.1',
+						LAYERS: 'bj_grid:china_railway_new'
+					},
+					serverType: 'geoserver'
+				})
+			});
+			var center = ol.proj.transform([126.184502092394, 43.4688331998097],'EPSG:4326','EPSG:3857');
+            var geom = new ol.geom.LineString([[123.459328658715, 41.8317625020658],[123.460429034672, 41.8333106099967],[123.460856270201, 41.8340219503528],[123.460941605071, 41.8341701604246],[123.461332030449, 41.8348924599192],[123.461405264941, 41.8350326201593],[123.461723195069, 41.8357173954415],[123.461759929677, 41.8358027752779],[123.462005334878, 41.8364455252408],[123.462331289657, 41.8374075696037],[123.463496890169, 41.8412724852371],[123.465641092052, 41.8484151599314]]);
+            geom = geom.transform("EPSG:4326", "EPSG:3857");
+			var feature = new ol.Feature({
+//                geometry: new ol.geom.Circle(center, 200000)
+                geometry:geom
+            });
+            feature
+            var _style = new ol.style.Style({
+                image: new ol.style.Circle({
+                    radius: 7,
+                    fill: new ol.style.Fill({
+                        color: [0, 153, 255, 1]
+                    }),
+                    stroke: new ol.style.Stroke({
+                        color: [255, 255, 255, 0.75],
+                        width: 1.5
+                    })
+                }),
+                fill: new ol.style.Fill({
+                    color: 'rgba(0, 0, 255, 0.3)'
+                }),
+                stroke: new ol.style.Stroke({
+                    color: '#55a6ff',
+                    width: 3,
+                    lineJoin: 'round'
+                })
+            });
+			var vector = new ol.layer.Vector({
+				source: new ol.source.Vector({
+					features: [feature]
+				}),
+				style:_style
+			});
+			var map = new ol.Map({
+				controls: ol.control.defaults({
+					attribution: false
+				}),
+				target: 'map',
+				layers: [untiled,vector],
+				view: new ol.View({
+					projection: new ol.proj.Projection({
+						code: 'EPSG:3857',
+						units: 'm'
+					}),
+					center: center,
+        			zoom: 5
+				})
+			});
+            var snap = new ol.interaction.Snap({
+                source: vector.getSource(),
+                pixelTolerance:20
+            });
+            map.addInteraction(snap);
+            var modify = new ol.interaction.Modify({
+                features: new ol.Collection([feature]),
+                style:_style
+            });
+            modify.on('modifyend', function(e) {
+                var _feat = e.features.getArray()[0];
+                var _geom = _feat.getGeometry();
+                var _c = _geom.getCenter(),
+					_r = _geom.getRadius();
+                _c = ol.proj.transform(_c,'EPSG:3857','EPSG:4326');
+                _r = _r / (2 * Math.PI * 6378137.0) * 360;
+                console.log(_c.join(","));
+                console.log(_r);
+//                map.removeInteraction(modify);
+//                map.removeLayer(vector);
+            });
+            map.addInteraction(modify);
+		}
+	</script>
+</head>
+<body onLoad="init()">
+<div id="map">
+</div>
+</body>
+</html>

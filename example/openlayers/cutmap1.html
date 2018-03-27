@@ -1,0 +1,112 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Ol3 wms</title>
+    <link rel="stylesheet" type="text/css" href="../../../plugin/ol3/css/ol.css"/>
+    <style type="text/css">
+        body, #map {
+            border: 0px;
+            margin: 0px;
+            padding: 0px;
+            width: 100%;
+            height: 100%;
+            font-size: 13px;
+        }
+    </style>
+    <script type="text/javascript" src="../../../plugin/ol3/build/ol-debug.js"></script>
+    <script type="text/javascript" src="../../../plugin/jquery/jquery-1.8.3.js"></script>
+    <script type="text/javascript">
+        function init(){
+            var bounds = [73.4510046356223, 18.1632471876417,
+                134.976797646506, 53.5319431522236];
+            var vec_c = getTdtLayer("vec_c");
+            var cva_c = getTdtLayer("cva_c");
+            var map = new ol.Map({
+                controls: ol.control.defaults({
+                    attribution: false
+                }),
+                target: 'map',
+                layers: [vec_c, cva_c],
+                view: new ol.View({
+                    projection: 'EPSG:4326'
+                })
+            });
+            map.getView().fit(bounds, map.getSize());
+
+            function getTdtLayer(lyr){
+                var url = "http://t0.tianditu.com/DataServer?T="+lyr+"&X={x}&Y={y}&L={z}";
+                var projection = ol.proj.get("EPSG:4326");
+                var projectionExtent = [ -180, -90, 180, 90 ];
+                var maxResolution = (ol.extent.getWidth(projectionExtent) / (256 * 2));
+                var resolutions = new Array(16);
+                var z;
+                for (z = 0; z < 16; ++z) {
+                    resolutions[z] = maxResolution / Math.pow(2, z);
+                }
+                var tileOrigin = ol.extent.getTopLeft(projectionExtent);
+                var layer = new ol.layer.Tile({
+                    extent: [ -180, -90, 180, 90 ],
+                    source: new ol.source.TileImage({
+                        tileUrlFunction: function(tileCoord) {
+                            var z = tileCoord[0]+1;
+                            var x = tileCoord[1];
+                            var y = -tileCoord[2]-1;
+                            var n = Math.pow(2, z + 1);
+                            x = x % n;
+                            if (x * n < 0) {
+                                x = x + n;
+                            }
+                            return url.replace('{z}', z.toString())
+                                .replace('{y}', y.toString())
+                                .replace('{x}', x.toString());
+                        },
+                        projection: projection,
+                        tileGrid: new ol.tilegrid.TileGrid({
+                            origin: tileOrigin,
+                            resolutions: resolutions,
+                            tileSize: 256
+                        })
+                    })
+                });
+                return layer;
+            }
+            $("#clip").on("click", function(){
+                var _canvas = $("#"+map.getTarget()).find("canvas")[0].getContext("2d");
+                console.log(_canvas);
+                var _coords = [[117.315375,40.181212],[117.367916,40.135762],[116.751758,40.002595],[116.754136,39.870341],[116.913383,39.804999],[116.901858,39.680614],[116.788145,39.56255],[116.535646,39.590346],[116.392103,39.491124],[116.4293,39.433841],[116.387072,39.417336],[116.237232,39.476253],[116.172242,39.578854],[115.728745,39.479123],[115.610225,39.588658],[115.508537,39.59137],[115.416399,39.733407],[115.416624,39.776734],[115.550565,39.772964],[115.408433,40.015829],[115.85422,40.144999],[115.922315,40.216777],[115.708758,40.499032],[115.89819,40.585919],[116.03778,40.577909],[116.208725,40.741562],[116.454984,40.739689],[116.297615,40.910402],[116.43816,40.870116],[116.405424,40.94854],[116.537137,40.9661],[116.621495,41.057333],[116.703349,40.853574],[116.93405,40.675155],[117.454502,40.647216],[117.387854,40.533274],[117.166811,40.503979],[117.164198,40.373887],[117.315375,40.181212]];
+                createClip(_coords, _canvas);
+            });
+            function createClip(coords, canvas) {
+                for (var i = 0, cout = coords.length; i < cout; i++) {
+                    var xLen = Math.round((coords[i][0] - center[0]) * pixelScale);
+                    var yLen = Math.round((center[1] - coords[i][1]) * pixelScale);
+                    var x = offsetX;
+                    var y = offsetY;
+                    if (rotation) {
+                        x = xLen * Math.cos(rotation) - yLen * Math.sin(rotation) + offsetX;
+                        y = xLen * Math.sin(rotation) + yLen * Math.cos(rotation) + offsetY;
+                    } else {
+                        x = xLen + offsetX;
+                        y = yLen + offsetY;
+                    }
+                    if (i == 0) {
+                        canvas.moveTo(x, y);
+                    } else {
+                        canvas.lineTo(x, y);
+                    }
+                }
+                canvas.closePath();
+            }
+            map.on('postcompose', function(event) {
+                var ctx = event.context;
+                ctx.restore();
+            });
+        }
+    </script>
+</head>
+<body onLoad="init()">
+<button id="clip">clip</button>
+<div id="map">
+</div>
+</body>
+</html>

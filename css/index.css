@@ -1,0 +1,90 @@
+@charset "UTF-8";
+/*定义滚动条高宽及背景 高宽分别对应横竖滚动条的尺寸*/
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  background-color: #f5f5f5; }
+
+/*定义滚动条轨道 内阴影+圆角*/
+::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  border-radius: 5px;
+  background-color: #f5f5f5; }
+
+/*定义滑块 内阴影+圆角*/
+::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  background-color: #aac5e7; }
+
+html, body {
+  font-size: 13px;
+  font-family: "微软雅黑";
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0; }
+
+.top,
+.foot {
+  position: absolute;
+  width: 100%;
+  height: 45px;
+  line-height: 45px;
+  padding: 0 8px;
+  font-weight: bold;
+  background: #0055aa;
+  color: #ffffff;
+  font-size: 15px;
+  left: 0; }
+
+.center {
+  position: absolute;
+  width: 100%;
+  top: 45px;
+  bottom: 25px; }
+  .center .href {
+    width: auto;
+    height: 20px;
+    line-height: 20px;
+    right: 10px;
+    z-index: 22;
+    top: 5px; }
+    .center .href a {
+      text-decoration: none;
+      cursor: pointer; }
+  .center .left {
+    width: 260px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    left: 0;
+    border-right: 3px solid #0055aa; }
+  .center .right {
+    left: 273px;
+    right: 0; }
+
+.center .left, .right, .href {
+  position: absolute;
+  height: 100%;
+  top: 0; }
+
+#showpanel, #prettyprint {
+  width: 100%;
+  height: 100%; }
+
+.foot {
+  height: 25px;
+  line-height: 25px;
+  font-size: 13px;
+  bottom: 0;
+  text-align: center; }
+
+ul.tabs li {
+  background: #ffffff; }
+
+.ztree li {
+  background: #ffffff;
+  border: none; }
+
+/*# sourceMappingURL=index.css.map */

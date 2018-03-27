@@ -1,0 +1,112 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>cluster</title>
+	<link rel="stylesheet" type="text/css" href="../../../plugin/ol4/ol.css"/>
+	<style type="text/css">
+		body, #map {
+			border: 0px;
+			margin: 0px;
+			padding: 0px;
+			width: 100%;
+			height: 100%;
+			font-size: 13px;
+		}
+	</style>
+	<script type="text/javascript" src="../../../plugin/ol4/ol.js"></script>
+	<script type="text/javascript" src="../../../plugin/jquery/jquery-1.8.3.js"></script>
+	<script type="text/javascript">
+		var map;
+		function init(){
+		    var lyr = "img_w";
+            var url = "http://t0.tianditu.com/DataServer?T="+lyr+"&X={x}&Y={y}&L={z}";
+            var layer = new ol.layer.Tile({
+                source: new ol.source.XYZ({
+                    url:url
+                })
+            });
+
+            var _center = ol.proj.transform([116.399, 39.969], 'EPSG:4326', 'EPSG:3857');
+			var _c = new ol.Feature({
+                geometry: new ol.geom.Point(_center),
+                type: "ccc",
+				name:"查找点"
+            });
+            var features = [];
+            var before = [{"id":"0c6b2787-894f-45bf-853e-b87f05902819","poiname":"东单","x":116.41183525500014,"y":39.906797520000055,"minzoom":11,"maxzoom":21,"geohash":"wx4g10b9bq5z"},{"id":"332c54dd-0a8b-4a40-9750-49ed13420a30","poiname":"东三环北路","x":116.45556963000013,"y":39.937372125000024,"minzoom":11,"maxzoom":21,"geohash":"wx4g4n2k53y2"},{"id":"642fa1bf-049c-4dbb-9294-a93c8150390c","poiname":"北四环东路","x":116.4041826450001,"y":39.98714610500008,"minzoom":11,"maxzoom":21,"geohash":"wx4g2z6yn039"},{"id":"6c095f4d-7eb5-4a67-a9a1-d7eb0644df4c","poiname":"奥体中心","x":116.38754890000007,"y":39.984410280000134,"minzoom":11,"maxzoom":21,"geohash":"wx4g2qyy46q9"},{"id":"a11b7753-eea1-4d6e-a3ef-ff59b7208399","poiname":"雍和宫","x":116.41051053000012,"y":39.94797240500009,"minzoom":11,"maxzoom":21,"geohash":"wx4g2br9c3zc"},{"id":"bd66d057-757e-4776-8b44-000c58518769","poiname":"北三环东路","x":116.43178228500005,"y":39.967247205000035,"minzoom":11,"maxzoom":21,"geohash":"wx4g37z414vk"},{"id":"dd0cf979-e552-46e3-8a6f-aa7d33db905e","poiname":"坝河","x":116.53293125000005,"y":39.970895295000105,"minzoom":11,"maxzoom":21,"geohash":"wx4g7u2xq4gm"},{"id":"e0d23103-e6a7-4fb9-84bb-8e1fe2f692b1","poiname":"安贞门","x":116.40027813500012,"y":39.97555010000008,"minzoom":11,"maxzoom":21,"geohash":"wx4g2v247ndh"},{"id":"e755b043-30fe-475e-a4b7-93de9dab5a71","poiname":"北小河","x":116.54073517000006,"y":39.99969476500007,"minzoom":11,"maxzoom":21,"geohash":"wx4gecwr5gw9"},{"id":"e8396b73-3f4f-4e26-a1af-013fc7337e7b","poiname":"王府井","x":116.40522367000005,"y":39.906653445000074,"minzoom":11,"maxzoom":21,"geohash":"wx4g0bg9n73u"},{"id":"fa46fa6d-30aa-4aba-839a-bb8a3d676952","poiname":"东四环北路","x":116.47886087000006,"y":39.95953531000009,"minzoom":11,"maxzoom":21,"geohash":"wx4g6d3m4jm8"},{"id":"000d9e89-4652-4969-9f06-36c92ef363b0","poiname":"地铁十三号线","x":116.42643876000011,"y":39.97132263500009,"minzoom":11,"maxzoom":21,"geohash":"wx4g3ke1udsg"},{"id":"0a3196ab-8afa-452e-8d6c-749ac9075c3d","poiname":"平房桥","x":116.53155120500014,"y":39.94603760000007,"minzoom":11,"maxzoom":21,"geohash":"wx4g5xzwtcn7"},{"id":"0d5456c8-1c46-4f7c-a2d1-a860682254d0","poiname":"德胜门东大街","x":116.38129414000014,"y":39.947543490000044,"minzoom":11,"maxzoom":21,"geohash":"wx4g224r29yd"},{"id":"0deccda6-8229-4466-a1ca-97d35dcf75e8","poiname":"北京-沈阳","x":116.4467439450001,"y":39.956866210000044,"minzoom":11,"maxzoom":21,"geohash":"wx4g3ccvtg9x"},{"id":"116e13ef-74c5-40c7-a514-d80069b7f775","poiname":"星火","x":116.50324255500004,"y":39.947458005000044,"minzoom":11,"maxzoom":21,"geohash":"wx4g705nf3fj"},{"id":"1ad1f711-8511-4073-b085-2d472908ba0a","poiname":"地铁十五号线","x":116.45284167000011,"y":39.99577974500005,"minzoom":11,"maxzoom":21,"geohash":"wx4g9cn27csr"},{"id":"1e7ddb0e-f10f-4e99-908a-1de9b5090b89","poiname":"小月河","x":116.38666022500013,"y":39.97464073000003,"minzoom":11,"maxzoom":21,"geohash":"wx4g2mnjjtpu"},{"id":"1ebbd126-03a1-4b9c-9fb4-433f3505e1eb","poiname":"机场第二高速","x":116.57892041000014,"y":39.950822575000075,"minzoom":11,"maxzoom":21,"geohash":"wx4gkbf4mtpe"},{"id":"244bd5a9-34f6-41ba-ab74-cbb514574aaa","poiname":"焦庄桥","x":116.5781772900001,"y":39.96091263500011,"minzoom":11,"maxzoom":21,"geohash":"wx4gkf9thqj3"},{"id":"24a46598-e434-40bc-ab6f-6706f1f573dc","poiname":"地铁二号线","x":116.41374775500014,"y":39.94806243500011,"minzoom":11,"maxzoom":21,"geohash":"wx4g303fkftf"},{"id":"2c05ed4e-1ee1-4d11-a7d7-b0edaeabc429","poiname":"亮马河","x":116.48208512000008,"y":39.95608087500011,"minzoom":11,"maxzoom":21,"geohash":"wx4g69g9j33f"},{"id":"2e8f8604-481f-4a4d-a176-1052c977d6b1","poiname":"五元桥","x":116.49401407000005,"y":39.997742095000035,"minzoom":11,"maxzoom":21,"geohash":"wx4gdck7er89"},{"id":"3e7ce78b-f6d6-488f-80f6-a29551ad2b09","poiname":"北京-承德高速公路","x":116.4407214150001,"y":39.99307612500013,"minzoom":11,"maxzoom":21,"geohash":"wx4g98t893wz"},{"id":"3f0904dc-cdad-433d-818c-6f54a5b4da37","poiname":"朝阳门北大街","x":116.42777897500014,"y":39.93472392500007,"minzoom":11,"maxzoom":21,"geohash":"wx4g1muheuh7"},{"id":"414676d7-e927-494a-978a-a6d9a11d4049","poiname":"护城河","x":116.39402875500014,"y":39.948107410000034,"minzoom":11,"maxzoom":21,"geohash":"wx4g287d96yq"},{"id":"4300a8a5-4a1c-412c-a4cf-8a73f430c98d","poiname":"东长安街","x":116.39869304500007,"y":39.906532255000116,"minzoom":11,"maxzoom":21,"geohash":"wx4g08ybqhu1"},{"id":"53f7f85d-606a-4110-9b3e-b10e98b50fed","poiname":"地铁八号线","x":116.3873717350001,"y":39.98825225000007,"minzoom":11,"maxzoom":21,"geohash":"wx4g2rwsqqd2"},{"id":"64df8a36-ce30-4496-bb16-057572c0681f","poiname":"地铁十四号线","x":116.47922531000006,"y":39.96199377000005,"minzoom":11,"maxzoom":21,"geohash":"wx4g6dce6xt6"},{"id":"64f6f1da-e537-4db8-a835-884cec5a915b","poiname":"通惠排干","x":116.53979241500008,"y":39.90253894000011,"minzoom":11,"maxzoom":21,"geohash":"wx4g5bj9jurs"},{"id":"65116352-270c-4b9b-90d8-5ef51c922a68","poiname":"八通线","x":116.61036866000006,"y":39.90494723000006,"minzoom":11,"maxzoom":21,"geohash":"wx4gj83p4t34"},{"id":"69391ad2-3f2c-4f92-a07c-6b45ac954f5a","poiname":"通惠河","x":116.5474171950001,"y":39.90532388000008,"minzoom":11,"maxzoom":21,"geohash":"wx4gh0e1ret1"},{"id":"81546384-584b-459c-9a91-93352205ef42","poiname":"建国门内大街","x":116.42069113500008,"y":39.90693002000012,"minzoom":11,"maxzoom":21,"geohash":"wx4g10yfwwzn"},{"id":"847e0051-dd1a-49b5-a94f-0f7ed103ddd4","poiname":"北京-塘沽","x":116.51339636000012,"y":39.90670974000011,"minzoom":11,"maxzoom":21,"geohash":"wx4g52f3qvvh"},{"id":"87720fa3-9f03-4c5f-bf64-a596950f65e0","poiname":"地铁十五号线","x":116.44092068500004,"y":39.99461102000009,"minzoom":11,"maxzoom":21,"geohash":"wx4g98v9qpg7"},{"id":"a077496f-9a8d-4630-8423-7c9678479aa1","poiname":"地铁六号线","x":116.51753398000005,"y":39.922562040000116,"minzoom":11,"maxzoom":21,"geohash":"wx4g57tmz2fq"},{"id":"aeb49cb4-851b-4e37-8f8f-3c6033fed1c4","poiname":"G6辅路","x":116.37330009000004,"y":39.983246155000074,"minzoom":11,"maxzoom":21,"geohash":"wx4g2nsrq3mc"},{"id":"b4daab95-32ef-4bdf-b307-aaae1aaab812","poiname":"机场高速","x":116.47239963000004,"y":39.97819310500006,"minzoom":11,"maxzoom":21,"geohash":"wx4g6mu9ge7g"},{"id":"bb4a507e-a859-4180-87cf-f56c0b16bb6c","poiname":"安定门西大街","x":116.39565756500008,"y":39.94765803000007,"minzoom":11,"maxzoom":21,"geohash":"wx4g28hxzrhy"},{"id":"c0998f1b-ae1a-472c-9289-5c69cc4a7359","poiname":"东三环中路","x":116.45552748500006,"y":39.9050539750001,"minzoom":11,"maxzoom":21,"geohash":"wx4g402rf3pp"},{"id":"c33e2096-a037-4914-9b57-0ef9b3bb3d8d","poiname":"机场快轨","x":116.46210810000014,"y":39.96953692500006,"minzoom":11,"maxzoom":21,"geohash":"wx4g6hjp7v9y"},{"id":"d26e3637-f25b-4262-9ecf-675b7c90fb8a","poiname":"京包","x":116.50301604000015,"y":39.98876824000013,"minzoom":11,"maxzoom":21,"geohash":"wx4g7pdzmn9n"},{"id":"d8ff5099-fde5-4d2a-a215-f8af9851e526","poiname":"安定门-四海","x":116.40139144500006,"y":39.99165988000004,"minzoom":11,"maxzoom":21,"geohash":"wx4g8b2bm18r"},{"id":"ebe0fe0c-1d72-4ebc-aaf2-b26ded91654f","poiname":"安定门东大街","x":116.41912146000004,"y":39.94825105000007,"minzoom":11,"maxzoom":21,"geohash":"wx4g30mg6jsz"},{"id":"f23a4ef3-9205-4c1e-9fb9-8b6a2599b318","poiname":"远通桥","x":116.53853274500011,"y":39.90815680500009,"minzoom":11,"maxzoom":21,"geohash":"wx4g5chcbesk"},{"id":"f4f4e54a-1cc3-4792-a1d9-18374315cf7f","poiname":"地铁五号线","x":116.41151797000009,"y":39.920024560000115,"minzoom":11,"maxzoom":21,"geohash":"wx4g150qbzzn"},{"id":"faf264f8-fb75-42d3-a83f-7a671cef28eb","poiname":"西长安街","x":116.37676238000006,"y":39.90588765000007,"minzoom":11,"maxzoom":21,"geohash":"wx4g00wuxhes"},{"id":"fb8f702d-1d51-4df6-8a3c-94189a0c4243","poiname":"京包","x":116.50322717000006,"y":39.93815196500009,"minzoom":11,"maxzoom":21,"geohash":"wx4g5ne09gns"},{"id":"10d6299b-5341-4f20-abc1-b584ccf98a4e","poiname":"小中河","x":116.66240624000011,"y":39.96327774000008,"minzoom":11,"maxzoom":21,"geohash":"wx4gqenfzngj"},{"id":"3b5ae6a7-dc27-4c3c-b4c6-25c93f6ca1fd","poiname":"通州-顺义","x":116.66145835500004,"y":39.9599122300001,"minzoom":11,"maxzoom":21,"geohash":"wx4gqdqr3583"},{"id":"6c33bdc1-0cb9-40cb-8473-cad8dc305692","poiname":"富豪-半壁店","x":116.6513031400001,"y":39.97726096000008,"minzoom":11,"maxzoom":21,"geohash":"wx4gqmwukmef"},{"id":"7c99b804-cc75-49c9-8ecf-567faf020654","poiname":"通州西","x":116.6210814100001,"y":39.903615495000054,"minzoom":11,"maxzoom":21,"geohash":"wx4gjb0zkjj4"},{"id":"9701a67a-3b2f-4183-884a-f18abbac7910","poiname":"G6辅路","x":116.37292809500013,"y":39.98316433500008,"minzoom":11,"maxzoom":21,"geohash":"wx4g2nsnvf03"},{"id":"a2aa035c-91ab-416a-958a-460411f43df8","poiname":"京承","x":116.65173268000012,"y":39.945644410000114,"minzoom":11,"maxzoom":21,"geohash":"wx4gnrzhnru6"},{"id":"bb810f71-aa1f-4028-9a06-a10575455572","poiname":"通惠河","x":116.66517986000008,"y":39.92231276000007,"minzoom":11,"maxzoom":21,"geohash":"wx4gng8urdrp"},{"id":"c8798f09-7d9d-41ac-a8e7-1e239c17ecde","poiname":"通燕高速","x":116.69275590500013,"y":39.922421495000094,"minzoom":11,"maxzoom":21,"geohash":"wx4gp7thfqc2"},{"id":"16ddd0a4-df66-4c63-937b-d6fcad6b2c46","poiname":"建国门北大街","x":116.42920543000014,"y":39.91070682000009,"minzoom":11,"maxzoom":21,"geohash":"wx4g13t0tngz"},{"id":"2f6edd3a-a6bd-4b85-bc26-1de00a7a4354","poiname":"朝阳门南大街","x":116.42847706000009,"y":39.91872779500011,"minzoom":11,"maxzoom":21,"geohash":"wx4g16uxknhy"},{"id":"73b88a15-64a9-4d0a-96c7-e05953a7f463","poiname":"温榆河","x":116.6369478150001,"y":39.957982865000076,"minzoom":11,"maxzoom":21,"geohash":"wx4gq4hkjggu"},{"id":"8caade02-3aeb-4e77-8286-7a3037555e06","poiname":"北京-拉萨高速公路","x":116.37282445000005,"y":39.98407994000013,"minzoom":11,"maxzoom":21,"geohash":"wx4g2nuh5kep"},{"id":"b409845a-e391-473b-99fb-04c9bb6fcb76","poiname":"北三环中路","x":116.3684926300001,"y":39.966675930000065,"minzoom":11,"maxzoom":21,"geohash":"wx4g258yy2mh"},{"id":"009aa6c9-fa9b-405a-b61d-b22fa3db7498","poiname":"来广营桥","x":116.44957800500015,"y":40.014929110000026,"minzoom":11,"maxzoom":21,"geohash":"wx4g9u7zzg6v"},{"id":"09812fb4-61ff-48b4-bd63-33f8ed27db8f","poiname":"机场高速","x":116.55707761500014,"y":40.0305920400001,"minzoom":11,"maxzoom":21,"geohash":"wx4gsr670g0q"},{"id":"09ba476e-2adc-4076-9bd3-5c659f5ac794","poiname":"李堡路","x":116.70874479000008,"y":40.039098540000055,"minzoom":11,"maxzoom":21,"geohash":"wx4gzbbswugw"},{"id":"145618d1-f674-4af9-a011-2cd801601706","poiname":"仰山桥","x":116.40242990000013,"y":40.02099231500006,"minzoom":11,"maxzoom":21,"geohash":"wx4g8v9ejjww"},{"id":"200da1a9-97ee-46d2-8566-b2281ed2134d","poiname":"望京","x":116.47308219500007,"y":40.019533865000085,"minzoom":11,"maxzoom":21,"geohash":"wx4gdmm4etbf"},{"id":"2668971e-4026-4767-8354-ba76e73c3ccb","poiname":"富豪-半壁店","x":116.64022548500009,"y":40.02054025500013,"minzoom":11,"maxzoom":21,"geohash":"wx4gwjwbd1rv"},{"id":"40cc14e5-b57e-44bc-a655-44412e75f133","poiname":"机场快轨","x":116.58650720000014,"y":40.03567651500009,"minzoom":11,"maxzoom":21,"geohash":"wx4gubr8wx08"},{"id":"435bca8c-b91d-41b9-a897-3bd95ed21d09","poiname":"李天桥","x":116.65764682500014,"y":40.034893335000106,"minzoom":11,"maxzoom":21,"geohash":"wx4gy85s0jn1"},{"id":"62712173-7ecd-4673-b1fe-defa693df5ea","poiname":"地铁五号线","x":116.40483135500006,"y":40.04654582500007,"minzoom":11,"maxzoom":21,"geohash":"wx4gbf72j1jq"},{"id":"7269b8f2-7334-4fb1-8588-b37cb6b6e994","poiname":"机场东路","x":116.62422808500014,"y":40.07457652000005,"minzoom":11,"maxzoom":21,"geohash":"wx4gvz75m6x2"},{"id":"7edd4741-d4a5-453b-afed-79247a5994cd","poiname":"通州-顺义","x":116.67156716000011,"y":40.017019880000134,"minzoom":11,"maxzoom":21,"geohash":"wx4gwuvsh91v"},{"id":"8c928a65-8f99-4b1c-b66e-e4b45b2e80e8","poiname":"北小河","x":116.49117392500011,"y":40.002541520000136,"minzoom":11,"maxzoom":21,"geohash":"wx4gdf4r9n4y"},{"id":"9664d7b7-8d36-4d97-a6ec-335b8ff0236b","poiname":"通顺路","x":116.65609330000007,"y":40.07803251500013,"minzoom":11,"maxzoom":21,"geohash":"wx4gyxfr7yzb"},{"id":"b0d13d82-11d3-4b60-b4f6-ed64f75a696a","poiname":"清河","x":116.3801652300001,"y":40.03024795500005,"minzoom":11,"maxzoom":21,"geohash":"wx4g8r33n7hf"},{"id":"b3a28bf4-1811-4432-bf83-1f28814560fa","poiname":"月牙河","x":116.67458348000014,"y":40.03871885500007,"minzoom":11,"maxzoom":21,"geohash":"wx4gybzf6y5j"},{"id":"b7a882d0-e949-4206-8875-1aabcf174b56","poiname":"管头桥","x":116.60284705000004,"y":40.02775125000005,"minzoom":11,"maxzoom":21,"geohash":"wx4gtqgde38k"},{"id":"c2255f5c-99c5-4ec6-8f48-e1d0069faeaf","poiname":"机场第二高速","x":116.59815851000008,"y":40.0196684550001,"minzoom":11,"maxzoom":21,"geohash":"wx4gtm25qnbm"},{"id":"d0fd6895-aa4b-4456-83bf-3c749f8b3cee","poiname":"同顺路","x":116.66115503000015,"y":40.04679103500007,"minzoom":11,"maxzoom":21,"geohash":"wx4gydq13yyj"},{"id":"d5f06ea9-cbb1-4ab4-8b37-2c1af51b1b1d","poiname":"小中河","x":116.66699125500008,"y":40.008803740000076,"minzoom":11,"maxzoom":21,"geohash":"wx4gwg6k1vtf"},{"id":"d9bc8014-3d46-46ed-82c1-ab04e630a304","poiname":"高白路","x":116.50638594500015,"y":40.07141442000011,"minzoom":11,"maxzoom":21,"geohash":"wx4ggnv2gt1c"},{"id":"de9a5244-435c-4b02-a4c0-b6daee2696d3","poiname":"温榆大桥","x":116.56551632000014,"y":40.034659255000065,"minzoom":11,"maxzoom":21,"geohash":"wx4gu806v3ks"},{"id":"188bbb4d-c6a0-4793-85f1-829d4780d493","poiname":"北窑上桥","x":116.67347226000004,"y":40.00952739000013,"minzoom":11,"maxzoom":21,"geohash":"wx4gwgx02uqr"},{"id":"1cbe577e-1603-488f-8b40-57a253fbae8b","poiname":"京承","x":116.65285087500013,"y":40.06689988000005,"minzoom":11,"maxzoom":21,"geohash":"wx4gytbn87qp"},{"id":"20e168a5-a8ee-44c4-a73c-f78a3f9bb267","poiname":"北京首都国际机场","x":116.61582102000011,"y":40.0709868350001,"minzoom":11,"maxzoom":21,"geohash":"wx4gvwtn3t6e"},{"id":"97894399-5df9-46bd-b00c-4b1b63520292","poiname":"黄港桥","x":116.4762608200001,"y":40.05725198500011,"minzoom":11,"maxzoom":21,"geohash":"wx4gfkpqmsfz"},{"id":"a3962994-79e6-4ad8-82f0-ca4713e97bb1","poiname":"西大坨桥","x":116.6831936000001,"y":40.03870001000007,"minzoom":11,"maxzoom":21,"geohash":"wx4gz0y476xh"},{"id":"a3cd954f-2672-4dbf-a1c9-883718a524af","poiname":"地铁十四号线","x":116.46090926500005,"y":40.01602840500004,"minzoom":11,"maxzoom":21,"geohash":"wx4gdhsnrbk5"},{"id":"cdfabc45-586e-4fa3-af6a-72ff3df265d1","poiname":"机场第二高速","x":116.6097326250001,"y":40.05331273000013,"minzoom":11,"maxzoom":21,"geohash":"wx4gve2x7wwv"},{"id":"d12bb86c-47e0-486f-a039-3ea087f26a6f","poiname":"王辛庄桥","x":116.68444038000007,"y":40.00128478500005,"minzoom":11,"maxzoom":21,"geohash":"wx4gx4p02eby"},{"id":"d426dda8-5277-48be-a335-047a727d8671","poiname":"北运河堤防-朝阳段","x":116.52537093500007,"y":40.065800975000116,"minzoom":11,"maxzoom":21,"geohash":"wx4ggtg0jywh"},{"id":"d49f6741-73f6-402d-9a81-bb289c19bd5c","poiname":"李天桥","x":116.64355314500006,"y":40.02777944000013,"minzoom":11,"maxzoom":21,"geohash":"wx4gwqc4xycj"}];
+            var after = [{"id":"642fa1bf-049c-4dbb-9294-a93c8150390c","poiname":"北四环东路","x":116.4041826450001,"y":39.98714610500008,"minzoom":11,"maxzoom":21,"geohash":"wx4g2z6yn039"},{"id":"6c095f4d-7eb5-4a67-a9a1-d7eb0644df4c","poiname":"奥体中心","x":116.38754890000007,"y":39.984410280000134,"minzoom":11,"maxzoom":21,"geohash":"wx4g2qyy46q9"},{"id":"a11b7753-eea1-4d6e-a3ef-ff59b7208399","poiname":"雍和宫","x":116.41051053000012,"y":39.94797240500009,"minzoom":11,"maxzoom":21,"geohash":"wx4g2br9c3zc"},{"id":"bd66d057-757e-4776-8b44-000c58518769","poiname":"北三环东路","x":116.43178228500005,"y":39.967247205000035,"minzoom":11,"maxzoom":21,"geohash":"wx4g37z414vk"},{"id":"e0d23103-e6a7-4fb9-84bb-8e1fe2f692b1","poiname":"安贞门","x":116.40027813500012,"y":39.97555010000008,"minzoom":11,"maxzoom":21,"geohash":"wx4g2v247ndh"},{"id":"000d9e89-4652-4969-9f06-36c92ef363b0","poiname":"地铁十三号线","x":116.42643876000011,"y":39.97132263500009,"minzoom":11,"maxzoom":21,"geohash":"wx4g3ke1udsg"},{"id":"0d5456c8-1c46-4f7c-a2d1-a860682254d0","poiname":"德胜门东大街","x":116.38129414000014,"y":39.947543490000044,"minzoom":11,"maxzoom":21,"geohash":"wx4g224r29yd"},{"id":"1e7ddb0e-f10f-4e99-908a-1de9b5090b89","poiname":"小月河","x":116.38666022500013,"y":39.97464073000003,"minzoom":11,"maxzoom":21,"geohash":"wx4g2mnjjtpu"},{"id":"24a46598-e434-40bc-ab6f-6706f1f573dc","poiname":"地铁二号线","x":116.41374775500014,"y":39.94806243500011,"minzoom":11,"maxzoom":21,"geohash":"wx4g303fkftf"},{"id":"414676d7-e927-494a-978a-a6d9a11d4049","poiname":"护城河","x":116.39402875500014,"y":39.948107410000034,"minzoom":11,"maxzoom":21,"geohash":"wx4g287d96yq"},{"id":"53f7f85d-606a-4110-9b3e-b10e98b50fed","poiname":"地铁八号线","x":116.3873717350001,"y":39.98825225000007,"minzoom":11,"maxzoom":21,"geohash":"wx4g2rwsqqd2"},{"id":"aeb49cb4-851b-4e37-8f8f-3c6033fed1c4","poiname":"G6辅路","x":116.37330009000004,"y":39.983246155000074,"minzoom":11,"maxzoom":21,"geohash":"wx4g2nsrq3mc"},{"id":"bb4a507e-a859-4180-87cf-f56c0b16bb6c","poiname":"安定门西大街","x":116.39565756500008,"y":39.94765803000007,"minzoom":11,"maxzoom":21,"geohash":"wx4g28hxzrhy"},{"id":"d8ff5099-fde5-4d2a-a215-f8af9851e526","poiname":"安定门-四海","x":116.40139144500006,"y":39.99165988000004,"minzoom":11,"maxzoom":21,"geohash":"wx4g8b2bm18r"},{"id":"ebe0fe0c-1d72-4ebc-aaf2-b26ded91654f","poiname":"安定门东大街","x":116.41912146000004,"y":39.94825105000007,"minzoom":11,"maxzoom":21,"geohash":"wx4g30mg6jsz"},{"id":"9701a67a-3b2f-4183-884a-f18abbac7910","poiname":"G6辅路","x":116.37292809500013,"y":39.98316433500008,"minzoom":11,"maxzoom":21,"geohash":"wx4g2nsnvf03"},{"id":"8caade02-3aeb-4e77-8286-7a3037555e06","poiname":"北京-拉萨高速公路","x":116.37282445000005,"y":39.98407994000013,"minzoom":11,"maxzoom":21,"geohash":"wx4g2nuh5kep"},{"id":"b409845a-e391-473b-99fb-04c9bb6fcb76","poiname":"北三环中路","x":116.3684926300001,"y":39.966675930000065,"minzoom":11,"maxzoom":21,"geohash":"wx4g258yy2mh"}];
+
+            for(var i=0;i<before.length;i++){
+                var _pt = ol.proj.transform([before[i].x, before[i].y], 'EPSG:4326', 'EPSG:3857');
+                features.push(new ol.Feature({
+                    geometry: new ol.geom.Point(_pt),
+                    type: "before"
+                }));
+			}
+            for(var i=0;i<after.length;i++){
+                var _pt = ol.proj.transform([after[i].x, after[i].y], 'EPSG:4326', 'EPSG:3857');
+                features.push(new ol.Feature({
+                    geometry: new ol.geom.Point(_pt),
+                    type: "after"
+                }));
+            }
+            features.push(_c);
+			var _circle = new ol.Feature({
+                geometry: new ol.geom.Circle(_center, 5000)
+            });
+            features.push(_circle);
+			var vectorSource = new ol.source.Vector({
+				features: features
+			});
+            function styleFunc(feature){
+				var type = feature.get("type"),
+					name = feature.get("name");
+                name = name?name:"";
+				var _color = "#ff0000";
+                if(type==="before")_color = "#0000ff";
+                if(type==="after")_color = "#ff00ff";
+                return new ol.style.Style({
+                    image: new ol.style.Circle({
+                        radius: 6,
+                        fill: new ol.style.Fill({
+                            color: _color
+                        }),
+                        stroke: new ol.style.Stroke({color: 'white', width: 1})
+                    }),
+                    text: new ol.style.Text({
+                        text: name,
+                        fill: new ol.style.Fill({
+                            color: '#000000'
+                        }),
+                        textAlign:"left",
+                        textBaseline:"bottom"
+                    }),
+                    stroke: new ol.style.Stroke({
+                        color: '#ff0000',
+                        width: 2
+                    })
+                });
+			}
+			var vectorLayer = new ol.layer.Vector({
+				source: vectorSource,
+				style: styleFunc
+			});
+			map = new ol.Map({
+				controls: ol.control.defaults({
+					attribution: false
+				}),
+				target: 'map',
+				layers: [layer, vectorLayer],
+				view: new ol.View({
+                    center: _center,
+                    zoom: 8
+				})
+			});
+		}
+	</script>
+</head>
+<body onLoad="init()">
+<div id="map">
+</div>
+</body>
+</html>
